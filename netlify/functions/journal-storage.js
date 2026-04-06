@@ -1,51 +1,87 @@
 const { getStore } = require("@netlify/blobs");
 
-exports.handler = async (event) => {
-    const headers = {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Headers": "Content-Type",
-                "Content-Type": "application/json"
-    };
+exports.handler = async (event, context) => {
 
-    if (event.httpMethod === "OPTIONS") {
-          return { statusCode: 200, headers, body: "" };
-    }
+      const headers = {
 
-    const store = getStore("journals");
-    const params = event.queryStringParameters || {};
-    const key = params.key;
+              "Access-Control-Allow-Origin": "*",
 
-    if (!key) {
-          return { statusCode: 400, headers, body: JSON.stringify({ error: "key required" }) };
-    }
+              "Access-Control-Allow-Headers": "Content-Type",
 
-    try {
-          if (event.httpMethod === "GET") {
-                  const val = await store.get(key);
-                  return {
-                            statusCode: 200,
-                            headers,
-                            body: JSON.stringify({ value: val || "[]" })
-                  };
-          }
+              "Content-Type": "application/json"
 
-      if (event.httpMethod === "POST") {
-              const body = JSON.parse(event.body || "{}");
-              await store.set(key, body.value || "[]");
-              return {
-                        statusCode: 200,
-                        headers,
-                        body: JSON.stringify({ ok: true })
-              };
+      };
+
+      if (event.httpMethod === "OPTIONS") {
+
+        return { statusCode: 200, headers, body: "" };
+
       }
 
-      return { statusCode: 405, headers, body: JSON.stringify({ error: "method not allowed" }) };
+      const params = event.queryStringParameters || {};
 
-    } catch (err) {
-          return {
+      const key = params.key;
+
+      if (!key) {
+
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "key required" }) };
+
+      }
+
+      try {
+
+        const store = getStore("journals");
+
+        if (event.httpMethod === "GET") {
+
+                let val = null;
+
+                try { val = await store.get(key); } catch(e) {}
+
+                return {
+
+                            statusCode: 200,
+
+                            headers,
+
+                            body: JSON.stringify({ value: val || "[]" })
+
+                };
+
+        }
+
+        if (event.httpMethod === "POST") {
+
+                const body = JSON.parse(event.body || "{}");
+
+                await store.set(key, body.value || "[]");
+
+                return {
+
+                            statusCode: 200,
+
+                            headers,
+
+                            body: JSON.stringify({ ok: true })
+
+                };
+
+        }
+
+        return { statusCode: 405, headers, body: JSON.stringify({ error: "method not allowed" }) };
+
+      } catch (err) {
+
+        return {
+
                   statusCode: 500,
+
                   headers,
+
                   body: JSON.stringify({ error: err.message })
-          };
-    }
+
+        };
+
+      }
+
 };
