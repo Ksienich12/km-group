@@ -1,0 +1,2157 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📋 Довідник компаній</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231a2744'/><text x='16' y='23' text-anchor='middle' font-size='20'>📋</text></svg>">
+<style>
+/* ═══════════════════════════════════════
+   БАЗОВІ СТИЛІ ДОВІДНИКА
+═══════════════════════════════════════ */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #f0f2f5; color: #1a1d23; font-family: Arial, sans-serif; font-size: 15px; line-height: 1.6; }
+
+/* HEADER */
+.header { background: #1a2744; border-bottom: 3px solid #d4a843; padding: 0 24px; display: flex; align-items: stretch; justify-content: space-between; position: sticky; top: 0; z-index: 200; }
+.header-left { display: flex; align-items: center; gap: 20px; }
+.header-title { font-family: monospace; font-size: 15px; font-weight: 700; color: #d4a843; letter-spacing: 0.06em; text-transform: uppercase; padding: 14px 0; cursor: pointer; }
+.header-title:hover { color: #f0c060; }
+.header-meta { font-family: monospace; font-size: 12px; color: #7a8fbe; padding: 14px 0; }
+
+
+
+/* TAB PANELS */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ═══════════════════════════════════════
+   ДОВІДНИК СТИЛІ
+═══════════════════════════════════════ */
+.layout { display: flex; min-height: calc(100vh - 56px); }
+.sidebar { width: 240px; flex-shrink: 0; background: #fff; border-right: 1px solid #dde1e9; padding: 12px 0; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; }
+.search-box { padding: 8px 14px 10px; border-bottom: 1px solid #dde1e9; }
+.search-input { width: 100%; background: #e8ebf0; border: 1px solid #c4cad6; border-radius: 3px; padding: 8px 10px; font-family: monospace; font-size: 13px; color: #1a1d23; outline: none; }
+.search-result { margin-top: 6px; font-family: monospace; font-size: 11px; color: #8a95a8; display: none; }
+.sidebar-link { display: block; padding: 7px 16px; cursor: pointer; font-size: 13px; color: #1a1d23; text-decoration: none; }
+.sidebar-link:hover { background: #f0f2f5; }
+.sidebar-link.dimmed { color: #c4cad6; }
+.sidebar-sep { border-top: 1px solid #dde1e9; margin-top: 8px; padding-top: 4px; }
+.main { flex: 1; padding: 20px 24px; }
+.stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 22px; }
+.stat-card { background: #fff; border: 1px solid #dde1e9; border-radius: 4px; padding: 14px 16px; }
+.stat-value { font-family: monospace; font-size: 24px; font-weight: 700; color: #1e4fa0; }
+.stat-label { font-size: 12px; color: #8a95a8; margin-top: 3px; }
+.company-card { background: #fff; border: 1px solid #dde1e9; border-radius: 6px; margin-bottom: 14px; overflow: hidden; }
+.company-card.hidden { display: none; }
+.company-header { padding: 13px 18px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: #f8f9fb; border-bottom: 1px solid #dde1e9; user-select: none; }
+.company-header:hover { background: #edf0f5; }
+.company-name { font-family: monospace; font-size: 16px; font-weight: 700; color: #1a1d23; }
+.company-fullname { font-size: 12px; color: #8a95a8; margin-top: 2px; }
+.badges { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+.badge-edr { font-family: monospace; font-size: 13px; background: rgba(30,79,160,0.07); color: #1e4fa0; border: 1px solid rgba(30,79,160,0.2); border-radius: 3px; padding: 2px 8px; }
+.card-stats { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+.card-stat { font-family: monospace; font-size: 11px; background: #f0f2f5; border: 1px solid #dde1e9; border-radius: 3px; padding: 2px 8px; color: #4a5568; white-space: nowrap; }
+.card-stat span { font-weight: 700; color: #1a1d23; }
+.arrow { color: #8a95a8; font-size: 16px; transition: transform 0.2s; display: inline-block; }
+.arrow.up { transform: rotate(0deg); }
+.arrow.down { transform: rotate(-90deg); }
+.company-body { display: none; }
+.company-body.open { display: block; }
+.body-grid { display: flex; flex-wrap: wrap; gap: 0; border-top: 1px solid #dde1e9; }
+.info-section { flex: 1 1 280px; padding: 16px 20px; border-right: 1px solid #dde1e9; min-width: 0; }
+.info-section:last-child { border-right: none; }
+.section-title { font-family: monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #8a95a8; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #dde1e9; }
+.info-row { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 8px; padding-bottom: 7px; border-bottom: 1px solid #f0f2f5; align-items: baseline; }
+.info-row:last-child { border-bottom: none; margin-bottom: 0; }
+.info-label { font-family: monospace; font-size: 11px; color: #8a95a8; flex-shrink: 0; text-transform: uppercase; letter-spacing: .04em; padding-top: 1px; }
+.info-value { font-size: 13px; color: #1a1d23; text-align: right; }
+.info-value.mono { font-family: monospace; }
+.edrpou-val { font-family: monospace; font-size: 14px; font-weight: 700; color: #1e4fa0; text-align: right; }
+.kbv-val { font-size: 13px; text-align: right; }
+.controls-wrap { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.ctrl-tag { background: #e8ebf0; border: 1px solid #c4cad6; border-radius: 3px; padding: 3px 8px; font-family: monospace; font-size: 11px; }
+.ctrl-pct { color: #1e4fa0; font-weight: 700; }
+.notes-list { margin-top: 0; }
+.note-item { padding: 4px 0 4px 10px; margin-bottom: 4px; font-size: 13px; }
+.note-normal { border-left: 2px solid #c4cad6; color: #4a5568; }
+.note-warn { border-left: 2px solid #c05a00; color: #7a3800; }
+.note-alert { border-left: 2px solid #8b0000; color: #8b0000; }
+.full-section { padding: 14px 20px; border-top: 1px solid #dde1e9; }
+.kved-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 0 24px; }
+.kved-item { display: flex; gap: 8px; padding: 4px 0; border-bottom: 1px solid #f0f2f5; font-size: 14px; }
+.kved-code { font-family: monospace; font-size: 12px; color: #1e4fa0; font-weight: 700; flex-shrink: 0; min-width: 40px; padding-top: 1px; }
+.kved-desc { color: #4a5568; }
+.kved-main .kved-desc { color: #1a1d23; font-weight: 600; }
+.iban-table { width: 100%; border-collapse: collapse; }
+.iban-table th { text-align: left; font-family: monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: #8a95a8; padding: 3px 12px 3px 0; border-bottom: 1px solid #c4cad6; }
+.iban-table td { padding: 5px 12px 5px 0; border-bottom: 1px solid #f0f2f5; font-size: 14px; }
+.iban-code { font-family: monospace; font-size: 12px; letter-spacing: 0.01em; }
+.iban-phone { font-family: monospace; color: #b04000; }
+.staff-table { width: 100%; border-collapse: collapse; }
+.staff-table th { text-align: left; font-family: monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: #8a95a8; padding: 3px 12px 3px 0; border-bottom: 1px solid #c4cad6; }
+.staff-table td { padding: 5px 12px 5px 0; border-bottom: 1px solid #f0f2f5; font-size: 13px; }
+.staff-table td:first-child { font-weight: 500; }
+.staff-name { font-family: monospace; font-size: 12px; color: #1a1d23; }
+.staff-role { font-size: 12px; color: #4a5568; font-style: italic; }
+/* Вкладка Співробітники */
+.staff-wrap { padding: 24px; max-width: 1100px; }
+.staff-filter-row { display: flex; gap: 10px; margin-bottom: 18px; align-items: center; flex-wrap: wrap; }
+.staff-filter-input { background: #e8ebf0; border: 1px solid #c4cad6; border-radius: 3px; padding: 7px 10px; font-family: monospace; font-size: 13px; color: #1a1d23; outline: none; width: 220px; }
+.staff-company-section { margin-bottom: 22px; }
+.staff-company-title { font-family: monospace; font-size: 13px; font-weight: 700; color: #1e4fa0; background: #f0f4ff; border-left: 3px solid #1e4fa0; padding: 6px 12px; margin-bottom: 0; }
+.staff-main-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #dde1e9; border-radius: 0 0 4px 4px; overflow: hidden; }
+.staff-main-table th { background: #e8ebf0; padding: 7px 12px; text-align: left; font-family: monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: #8a95a8; border-bottom: 1px solid #c4cad6; }
+.staff-main-table td { padding: 7px 12px; border-bottom: 1px solid #f0f2f5; font-size: 13px; }
+.staff-main-table tr:last-child td { border-bottom: none; }
+.staff-person-tag { display: inline-block; background: #e8ebf0; border-radius: 3px; padding: 2px 7px; font-family: monospace; font-size: 11px; margin: 1px; color: #1a1d23; }
+
+.not-found { background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; padding: 12px 16px; margin-bottom: 16px; font-size: 15px; color: #856404; display: none; }
+
+/* ═══════════════════════════════════════
+   СХЕМА ВЛАСНОСТІ — власний namespace
+   Всі стилі схеми з префіксом sv-
+═══════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500&display=swap');
+
+#schema-view { font-family: 'IBM Plex Sans', Arial, sans-serif; background: #eef1f6; min-height: calc(100vh - 56px); }
+
+/* legend */
+.sv-leg { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 7px 28px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+.sv-li { display: flex; align-items: center; gap: 5px; font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #64748b; }
+.sv-ld { width: 11px; height: 11px; border-radius: 2px; flex-shrink: 0; }
+
+/* page layout */
+.sv-page { display: flex; gap: 0; align-items: flex-start; }
+.sv-holdco { flex: 1; padding: 24px 20px 24px 24px; overflow-x: auto; }
+.sv-personal { width: 280px; min-width: 280px; background: #fff8f0; border-left: 2px solid #fed7aa; padding: 20px 16px; min-height: calc(100vh - 90px); }
+.sv-personal-title { font-family: 'IBM Plex Mono', monospace; font-size: 8px; text-transform: uppercase; letter-spacing: .12em; color: #9a3412; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #fed7aa; }
+
+/* nodes */
+.sv-n { border-radius: 7px; padding: 10px 14px; cursor: pointer; text-align: center; transition: transform .12s, box-shadow .12s; display: inline-block; width: 100%; }
+.sv-n:hover { transform: translateY(-2px); }
+.sv-nn { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 12px; }
+.sv-nc { font-family: 'IBM Plex Mono', monospace; font-size: 8px; margin-top: 2px; opacity: .65; }
+.sv-nd { font-size: 9px; margin-top: 3px; opacity: .8; }
+.sv-nw { font-size: 8px; margin-top: 4px; background: rgba(0,0,0,.18); border-radius: 3px; padding: 2px 6px; display: inline-block; }
+.sv-phys { background: #991b1b; border: 2px solid #7f1d1d; color: #fff; box-shadow: 0 2px 8px rgba(153,27,27,.3); }
+.sv-hold { background: #1e40af; border: 2px solid #1e3a8a; color: #fff; box-shadow: 0 2px 8px rgba(30,64,175,.25); }
+.sv-ops  { background: #166534; border: 2px solid #14532d; color: #fff; box-shadow: 0 2px 8px rgba(22,101,52,.25); }
+.sv-pers { background: #92400e; border: 2px solid #78350f; color: #fff; box-shadow: 0 2px 8px rgba(146,64,14,.25); }
+.sv-unk  { background: #f8fafc; border: 2px dashed #94a3b8; color: #334155; }
+
+/* personal pairs */
+.sv-ppair { margin-bottom: 16px; }
+.sv-pco-row { display: flex; gap: 8px; }
+.sv-pco-row .sv-n { flex: 1; }
+.sv-pdivider { height: 1px; background: #fed7aa; margin: 14px 0; }
+
+/* summary bar */
+.sv-summ { display: grid; grid-template-columns: repeat(4,1fr); background: #0f172a; border-top: 2px solid #1e293b; }
+.sv-sc { padding: 12px 18px; border-right: 1px solid #1e293b; }
+.sv-sc:last-child { border-right: none; }
+.sv-sn { font-family: 'IBM Plex Mono', monospace; font-size: 17px; font-weight: 600; color: #fff; }
+.sv-sl { font-family: 'IBM Plex Mono', monospace; font-size: 7px; color: #475569; text-transform: uppercase; letter-spacing: .06em; margin-top: 2px; }
+
+/* side panel */
+.sv-panel { position: fixed; right: 0; top: 0; width: 320px; height: 100vh; background: #fff; border-left: 2px solid #e2e8f0; padding: 20px 16px; overflow-y: auto; transform: translateX(100%); transition: transform .2s ease; z-index: 500; box-shadow: -4px 0 16px rgba(0,0,0,.1); }
+.sv-panel.open { transform: translateX(0); }
+.sv-pcl { position: absolute; top: 10px; right: 10px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 4px; width: 24px; height: 24px; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; color: #64748b; }
+.sv-ph2 { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #0f172a; padding-right: 30px; line-height: 1.35; margin-bottom: 2px; }
+.sv-pedr { font-family: 'IBM Plex Mono', monospace; font-size: 8px; color: #94a3b8; margin-bottom: 10px; }
+.sv-pdiv { height: 1px; background: #e2e8f0; margin: 8px 0; }
+.sv-ps { margin-bottom: 7px; }
+.sv-pl { font-family: 'IBM Plex Mono', monospace; font-size: 7px; text-transform: uppercase; letter-spacing: .08em; color: #94a3b8; margin-bottom: 2px; }
+.sv-pv { font-size: 10px; color: #1e293b; line-height: 1.4; }
+.sv-badge { display: inline-block; padding: 2px 6px; border-radius: 3px; font-family: 'IBM Plex Mono', monospace; font-size: 8px; font-weight: 600; margin: 0 2px 3px 0; }
+.sv-br { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+.sv-bb { background: #dbeafe; color: #1e3a8a; border: 1px solid #93c5fd; }
+.sv-bg { background: #dcfce7; color: #14532d; border: 1px solid #86efac; }
+.sv-ba { background: #fef3c7; color: #78350f; border: 1px solid #fcd34d; }
+.sv-wbox { background: #fff7ed; border: 1px solid #fdba74; border-radius: 4px; padding: 8px 10px; font-size: 9px; color: #7c2d12; margin-top: 8px; line-height: 1.5; }
+.sv-ibox { background: #eff6ff; border: 1px solid #93c5fd; border-radius: 4px; padding: 8px 10px; font-size: 9px; color: #1e3a8a; margin-top: 8px; line-height: 1.5; }
+
+/* connector helpers */
+.sv-vline-red  { width: 2px; background: #dc2626; }
+.sv-vline-blue { width: 2px; background: #2563eb; }
+.sv-vline-green{ width: 2px; background: #16a34a; }
+.sv-vline-ambe { width: 2px; background: #d97706; }
+.sv-pct-red  { font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600; color: #dc2626; }
+.sv-pct-blue { font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600; color: #1e40af; }
+.sv-pct-green{ font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600; color: #166534; }
+.sv-pct-ambe { font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600; color: #d97706; }
+
+
+
+/* ═══════════════════════════════════════
+   БІБЛІОТЕКА ДОКУМЕНТІВ
+═══════════════════════════════════════ */
+.lib-wrap { padding: 24px; max-width: 1100px; }
+.lib-intro { font-size: 13px; color: #8a95a8; margin-bottom: 20px; font-family: monospace; }
+.lib-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+.lib-card { background: #fff; border: 1px solid #dde1e9; border-radius: 6px; overflow: hidden; }
+.lib-card-head { padding: 10px 14px; display: flex; align-items: center; gap: 10px; background: #f8f9fb; border-bottom: 1px solid #dde1e9; }
+.lib-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.lib-card-name { font-family: monospace; font-size: 13px; font-weight: 700; color: #1a1d23; }
+.lib-card-edr { font-family: monospace; font-size: 11px; color: #8a95a8; margin-left: auto; }
+.lib-folders { padding: 4px 0; }
+.lib-folder { display: flex; align-items: center; gap: 8px; padding: 6px 14px; font-size: 13px; color: #4a5568; text-decoration: none; border-left: 3px solid transparent; transition: background .1s, border-color .1s; }
+.lib-folder:hover { background: #f0f2f5; color: #1a1d23; border-left-color: #d4a843; }
+.lib-folder.no-link { color: #c4cad6; cursor: default; }
+.lib-folder.no-link:hover { background: none; border-left-color: transparent; }
+.lib-folder-icon { font-size: 13px; flex-shrink: 0; }
+.lib-folder-name { flex: 1; }
+.lib-card-foot { padding: 6px 14px 10px; font-size: 11px; color: #8a95a8; font-family: monospace; border-top: 1px solid #f0f2f5; margin-top: 4px; }
+
+/* ═══════════════════════════════════════
+   БАНКІВСЬКІ РАХУНКИ
+═══════════════════════════════════════ */
+.ibans-wrap { padding: 24px; max-width: 900px; }
+.ibans-filter-row { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; }
+.ibans-search { background: #e8ebf0; border: 1px solid #c4cad6; border-radius: 3px; padding: 8px 12px; font-family: monospace; font-size: 13px; color: #1a1d23; outline: none; width: 320px; }
+.ibans-count { font-family: monospace; font-size: 12px; color: #8a95a8; }
+/* акордеон */
+.ibank-block { background: #fff; border: 1px solid #dde1e9; border-radius: 6px; margin-bottom: 10px; overflow: hidden; }
+.ibank-block.hidden { display: none; }
+.ibank-head { display: flex; align-items: center; justify-content: space-between; padding: 11px 18px; cursor: pointer; background: #f8f9fb; border-bottom: 1px solid transparent; user-select: none; }
+.ibank-head:hover { background: #edf0f5; }
+.ibank-head.open { border-bottom-color: #dde1e9; }
+.ibank-co { font-family: monospace; font-size: 14px; font-weight: 700; color: #1a1d23; }
+.ibank-edr { font-family: monospace; font-size: 12px; color: #1e4fa0; margin-left: 12px; }
+.ibank-meta { display: flex; align-items: center; gap: 10px; }
+.ibank-badge-count { font-family: monospace; font-size: 11px; background: #e8ebf0; border-radius: 3px; padding: 2px 8px; color: #4a5568; }
+.ibank-arrow { color: #8a95a8; font-size: 14px; transition: transform .2s; }
+.ibank-arrow.up { transform: rotate(180deg); }
+.ibank-body { display: none; }
+.ibank-body.open { display: block; }
+.ibank-table { width: 100%; border-collapse: collapse; }
+.ibank-table th { background: #f0f2f5; padding: 7px 16px; text-align: left; font-family: monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .07em; color: #8a95a8; border-bottom: 1px solid #dde1e9; }
+.ibank-table td { padding: 9px 16px; border-bottom: 1px solid #f0f2f5; font-size: 13px; }
+.ibank-table tr:last-child td { border-bottom: none; }
+.ibank-iban { font-family: monospace; font-size: 12px; color: #1a1d23; }
+.ibank-bank { color: #4a5568; }
+.ibank-curr { font-family: monospace; font-size: 10px; color: #8a95a8; margin-left: 6px; }
+/* закриті */
+.ibank-table tr.closed td { color: #b0b8c8; background: #fafafa; }
+.ibank-table tr.closed .ibank-iban { text-decoration: line-through; color: #b0b8c8; }
+.ibans-badge-closed { display: inline-block; font-family: monospace; font-size: 9px; background: #f1f5f9; border: 1px solid #cbd5e1; color: #94a3b8; border-radius: 3px; padding: 1px 5px; margin-left: 6px; vertical-align: middle; }
+
+/* ═══ ЖУРНАЛИ РЕЄСТРАЦІЇ ═══ */
+/* HEADER */
+.header { background: #1a2744; border-bottom: 3px solid #d4a843; padding: 0 24px; display: flex; align-items: stretch; justify-content: space-between; position: sticky; top: 0; z-index: 200; min-height: 56px; }
+.header-left { display: flex; align-items: center; gap: 20px; }
+.header-title { font-family: monospace; font-size: 15px; font-weight: 700; color: #d4a843; letter-spacing: 0.06em; text-transform: uppercase; padding: 14px 0; }
+.header-meta { font-family: monospace; font-size: 12px; color: #7a8fbe; }
+.tab-nav { display: flex; align-items: stretch; }
+.tab-btn { padding: 0 18px; font-family: monospace; font-size: 12px; font-weight: 700; color: #7a8fbe; background: none; border: none; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -3px; transition: color .15s, border-color .15s; letter-spacing: .05em; text-transform: uppercase; }
+.tab-btn:hover { color: #d4a843; }
+.tab-btn.active { color: #d4a843; border-bottom-color: #d4a843; }
+
+/* LAYOUT */
+.layout { display: flex; min-height: calc(100vh - 56px); }
+.sidebar { width: 220px; flex-shrink: 0; background: #fff; border-right: 1px solid #dde1e9; padding: 16px 0; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; }
+.main { flex: 1; padding: 20px 24px; min-width: 0; }
+
+/* SIDEBAR */
+.sidebar-section { padding: 4px 0 10px; border-bottom: 1px solid #f0f2f5; margin-bottom: 4px; }
+.sidebar-label { font-family: monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: #8a95a8; padding: 6px 16px 4px; }
+.sidebar-link { display: block; padding: 6px 16px; cursor: pointer; font-size: 12px; color: #4a5568; text-decoration: none; border-left: 3px solid transparent; transition: all .12s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar-link:hover { background: #f0f2f5; color: #1a1d23; border-left-color: #d4a843; }
+.sidebar-link.active { background: #f0f4ff; color: #1e4fa0; border-left-color: #1e4fa0; font-weight: 700; }
+
+/* STATS */
+.stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 18px; }
+.stat-card { background: #fff; border: 1px solid #dde1e9; border-radius: 4px; padding: 12px 14px; }
+.stat-value { font-family: monospace; font-size: 22px; font-weight: 700; color: #1e4fa0; }
+.stat-label { font-size: 11px; color: #8a95a8; margin-top: 2px; }
+
+/* TOOLBAR */
+.toolbar { background: #fff; border: 1px solid #dde1e9; border-radius: 6px; padding: 12px 16px; margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+.filter-group { display: flex; flex-direction: column; gap: 4px; }
+.filter-label { font-family: monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: #8a95a8; }
+.filter-input, .filter-select { background: #f0f2f5; border: 1px solid #c4cad6; border-radius: 3px; padding: 6px 10px; font-family: monospace; font-size: 12px; color: #1a1d23; outline: none; height: 32px; }
+.filter-input:focus, .filter-select:focus { border-color: #1e4fa0; background: #fff; }
+.filter-input { width: 200px; }
+.filter-select { width: 200px; }
+.btn { padding: 6px 16px; font-family: monospace; font-size: 12px; font-weight: 700; border-radius: 3px; cursor: pointer; border: none; height: 32px; letter-spacing: .04em; text-transform: uppercase; transition: all .12s; }
+.btn-primary { background: #1a2744; color: #d4a843; }
+.btn-primary:hover { background: #243660; }
+.btn-success { background: #166534; color: #bbf7d0; }
+.btn-success:hover { background: #14532d; }
+.btn-danger { background: #fff; color: #8b0000; border: 1px solid #fca5a5; }
+.btn-danger:hover { background: #fee2e2; }
+.btn-sm { padding: 4px 10px; font-size: 11px; height: 26px; }
+.btn-export { background: #fff; color: #1e4fa0; border: 1px solid #c4cad6; }
+.btn-export:hover { background: #f0f4ff; }
+.ml-auto { margin-left: auto; }
+
+/* TABLE */
+.table-wrap { background: #fff; border: 1px solid #dde1e9; border-radius: 6px; overflow: hidden; }
+.table-wrap table { width: 100%; border-collapse: collapse; }
+.table-wrap th { background: #f0f2f5; padding: 8px 12px; text-align: left; font-family: monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: #8a95a8; border-bottom: 1px solid #dde1e9; white-space: nowrap; cursor: pointer; user-select: none; }
+.table-wrap th:hover { background: #e8ebf0; color: #1a1d23; }
+.table-wrap th.sorted { color: #1e4fa0; }
+.table-wrap td { padding: 8px 12px; border-bottom: 1px solid #f0f2f5; font-size: 12px; vertical-align: middle; }
+.table-wrap tr:last-child td { border-bottom: none; }
+.table-wrap tr:hover td { background: #f8f9fb; }
+.num-cell { font-family: monospace; font-weight: 700; color: #1e4fa0; white-space: nowrap; }
+.num-link { text-decoration: underline; text-decoration-style: dotted; cursor: pointer; }
+.num-link:hover { text-decoration-style: solid; }
+.date-cell { font-family: monospace; font-size: 11px; color: #4a5568; white-space: nowrap; }
+.co-badge { display: inline-block; background: #e8ebf0; border-radius: 3px; padding: 2px 7px; font-family: monospace; font-size: 10px; color: #1e4fa0; white-space: nowrap; }
+.link-cell a { color: #1e4fa0; text-decoration: none; font-family: monospace; font-size: 11px; }
+.link-cell a:hover { text-decoration: underline; }
+.no-link { color: #c4cad6; font-size: 11px; }
+.actions-cell { display: flex; gap: 4px; white-space: nowrap; }
+.empty-state { text-align: center; padding: 40px 20px; color: #8a95a8; font-family: monospace; font-size: 13px; }
+
+/* STATUS BADGES */
+.status { display: inline-block; padding: 2px 8px; border-radius: 3px; font-family: monospace; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+.status-active  { background: #dcfce7; color: #14532d; border: 1px solid #86efac; }
+.status-closed  { background: #f0f2f5; color: #8a95a8; border: 1px solid #c4cad6; }
+.status-pending { background: #fef3c7; color: #78350f; border: 1px solid #fcd34d; }
+.status-in { background: #dbeafe; color: #1e3a8a; border: 1px solid #93c5fd; }
+.status-out { background: #f0fdf4; color: #14532d; border: 1px solid #86efac; }
+
+/* TYPE BADGES */
+.type-badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-family: monospace; font-size: 10px; font-weight: 700; }
+.type-in   { background: #dbeafe; color: #1e3a8a; }
+.type-out  { background: #dcfce7; color: #14532d; }
+.type-contr { background: #fef3c7; color: #78350f; }
+.type-proto { background: #ede9fe; color: #4c1d95; }
+
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 500; display: flex; align-items: center; justify-content: center; }
+.modal { background: #fff; border-radius: 8px; width: 680px; max-width: 95vw; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 40px rgba(0,0,0,.18); }
+.modal-header { padding: 16px 20px; border-bottom: 1px solid #dde1e9; display: flex; align-items: center; justify-content: space-between; background: #f8f9fb; border-radius: 8px 8px 0 0; }
+.modal-title { font-family: monospace; font-size: 14px; font-weight: 700; color: #1a2744; }
+.modal-close { background: none; border: none; font-size: 18px; cursor: pointer; color: #8a95a8; padding: 0 4px; }
+.modal-body { padding: 20px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group.full { grid-column: 1/-1; }
+.form-label { font-family: monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: #8a95a8; }
+.form-input, .form-select, .form-textarea { background: #f0f2f5; border: 1px solid #c4cad6; border-radius: 3px; padding: 8px 10px; font-family: monospace; font-size: 12px; color: #1a1d23; outline: none; width: 100%; }
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: #1e4fa0; background: #fff; }
+.form-textarea { resize: vertical; min-height: 60px; }
+.modal-footer { padding: 14px 20px; border-top: 1px solid #dde1e9; display: flex; gap: 8px; justify-content: flex-end; }
+
+/* PAGINATION */
+.pagination { display: flex; align-items: center; gap: 6px; padding: 10px 16px; border-top: 1px solid #dde1e9; background: #f8f9fb; }
+.pg-btn { font-family: monospace; font-size: 11px; padding: 4px 10px; background: #fff; border: 1px solid #c4cad6; border-radius: 3px; cursor: pointer; color: #4a5568; }
+.pg-btn:hover:not(:disabled) { background: #e8ebf0; }
+.pg-btn:disabled { opacity: .4; cursor: default; }
+.pg-info { font-family: monospace; font-size: 11px; color: #8a95a8; margin: 0 6px; }
+
+/* HIDDEN */
+.hidden { display: none !important; }
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<div class="header">
+  <div class="header-left">
+    <div class="header-title" onclick="switchTab('directory')" title="На головну">Довідник компаній групи</div>
+    <div class="header-meta">Оновлено: 01.04.2026 &nbsp;·&nbsp; ЄДР 01.04.2026 &nbsp;·&nbsp; Конфіденційно</div>
+  </div>
+  <div style="display:flex;align-items:stretch;gap:0">
+    <button onclick="switchTab('schema')" style="padding:0 14px;font-family:monospace;font-size:11px;font-weight:700;color:#7a8fbe;background:none;border:none;cursor:pointer;border-bottom:3px solid transparent;letter-spacing:.04em;text-transform:uppercase" onmouseover="this.style.color='#d4a843'" onmouseout="this.style.color='#7a8fbe'">🗂 Схема</button>
+    <button onclick="switchTab('docs')" style="padding:0 14px;font-family:monospace;font-size:11px;font-weight:700;color:#7a8fbe;background:none;border:none;cursor:pointer;border-bottom:3px solid transparent;letter-spacing:.04em;text-transform:uppercase" onmouseover="this.style.color='#d4a843'" onmouseout="this.style.color='#7a8fbe'">📁 Документи</button>
+    <button onclick="switchTab('staff')" style="padding:0 14px;font-family:monospace;font-size:11px;font-weight:700;color:#7a8fbe;background:none;border:none;cursor:pointer;border-bottom:3px solid transparent;letter-spacing:.04em;text-transform:uppercase" onmouseover="this.style.color='#d4a843'" onmouseout="this.style.color='#7a8fbe'">👥 Співробітники</button>
+    <button onclick="switchTab('ibans')" style="padding:0 14px;font-family:monospace;font-size:11px;font-weight:700;color:#7a8fbe;background:none;border:none;cursor:pointer;border-bottom:3px solid transparent;letter-spacing:.04em;text-transform:uppercase" onmouseover="this.style.color='#d4a843'" onmouseout="this.style.color='#7a8fbe'">🏦 Рахунки</button>
+    <button onclick="switchTab('kveds')" style="padding:0 14px;font-family:monospace;font-size:11px;font-weight:700;color:#7a8fbe;background:none;border:none;cursor:pointer;border-bottom:3px solid transparent;letter-spacing:.04em;text-transform:uppercase" onmouseover="this.style.color='#d4a843'" onmouseout="this.style.color='#7a8fbe'">📑 КВЕДи</button>
+    <button onclick="switchTab('journals')" style="padding:0 14px;font-family:monospace;font-size:11px;font-weight:700;color:#7a8fbe;background:none;border:none;cursor:pointer;border-bottom:3px solid transparent;letter-spacing:.04em;text-transform:uppercase" onmouseover="this.style.color='#d4a843'" onmouseout="this.style.color='#7a8fbe'">📋 Журнали</button>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     ВКЛАДКА 1: ДОВІДНИК
+═══════════════════════════════════════════ -->
+<div id="tab-directory" class="tab-panel active">
+<div class="layout">
+  <nav class="sidebar" id="sidebar">
+    <div class="search-box">
+      <input class="search-input" type="text" id="q" placeholder="Пошук...">
+      <div class="search-result" id="searchResult"></div>
+    </div>
+    <a class="sidebar-link" id="sl-amber" onclick="goto('amber')">АМБЕР ТЕКНОЛОДЖІ</a>
+    <a class="sidebar-link" id="sl-bsn" onclick="goto('bsn')">БІЗСЕРВІСНЕО</a>
+    <a class="sidebar-link" id="sl-jarvis" onclick="goto('jarvis')">ДЖАРВИС</a>
+    <a class="sidebar-link" id="sl-dtz" onclick="goto('dtz')">ДОБРОБУТ ТА ЗАХИСТ (ДТЗ)</a>
+    <a class="sidebar-link" id="sl-ds7" onclick="goto('ds7')">ДС7</a>
+    <a class="sidebar-link" id="sl-m21" onclick="goto('m21')">М21</a>
+    <a class="sidebar-link" id="sl-m41" onclick="goto('m41')">М41</a>
+    <a class="sidebar-link" id="sl-profpos" onclick="goto('profpos')">ПРОФПОСЕРЕДНИК</a>
+    <a class="sidebar-link" id="sl-skyins" onclick="goto('skyins')">СКАЙІНС</a>
+    <a class="sidebar-link" id="sl-smart" onclick="goto('smart')">СМАРТКОНСАЛТ</a>
+    <a class="sidebar-link" id="sl-fit" onclick="goto('fit')">ФІТ</a>
+    <a class="sidebar-link" id="sl-fokusit" onclick="goto('fokusit')">ФОКУСІТ</a>
+    <a class="sidebar-link" id="sl-cop" onclick="goto('cop')">ЦОП</a>
+    <a class="sidebar-link" id="sl-romasset" onclick="goto('romasset')">ROMASSET HOLDINGS 🇷🇴</a>
+    <div class="sidebar-sep">
+      <a class="sidebar-link" onclick="switchTab('schema')">🗂 Схема власності →</a>
+      <a class="sidebar-link" onclick="switchTab('docs')">📁 Документи →</a>
+      <a class="sidebar-link" onclick="switchTab('staff')">👥 Співробітники →</a>
+      <a class="sidebar-link" onclick="switchTab('ibans')">🏦 Рахунки →</a>
+      <a class="sidebar-link" onclick="switchTab('kveds')">📑 КВЕДи →</a>
+      <a class="sidebar-link" onclick="switchTab('journals')">📋 Журнали →</a>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-value">14</div><div class="stat-label">компаній в групі (13 UA + 1 RO)</div></div>
+      <div class="stat-card"><div class="stat-value">239 млн</div><div class="stat-label">загальний капітал (грн)</div></div>
+      <div class="stat-card"><div class="stat-value">29</div><div class="stat-label">банківських рахунків (IBAN)</div></div>
+      <div class="stat-card"><div class="stat-value">100%</div><div class="stat-label">КБВ — Земляна Н.А.</div></div>
+    </div>
+    <div class="not-found" id="notFound"></div>
+    <div id="cards"></div>
+
+  </main>
+</div>
+</div><!-- /tab-directory -->
+
+<!-- ═══════════════════════════════════════════
+     ВКЛАДКА 2: СХЕМА ВЛАСНОСТІ
+═══════════════════════════════════════════ -->
+<div id="tab-schema" class="tab-panel">
+<div id="schema-view">
+
+<div class="sv-leg">
+  <div class="sv-li"><div class="sv-ld" style="background:#991b1b"></div>Фізична особа / КБВ</div>
+  <div class="sv-li"><div class="sv-ld" style="background:#1e40af"></div>Холдингова компанія</div>
+  <div class="sv-li"><div class="sv-ld" style="background:#166534"></div>Операційна компанія</div>
+  <div class="sv-li"><div class="sv-ld" style="background:#92400e"></div>Особиста компанія</div>
+  <div class="sv-li"><div class="sv-ld" style="background:#f8fafc;border:2px dashed #94a3b8"></div>Структура уточнюється</div>
+  <span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:8px;color:#94a3b8">клік на вузол → деталі</span>
+</div>
+
+<div style="overflow-x:auto;padding:16px;-webkit-overflow-scrolling:touch">
+<svg id="sv-main" width="1400" height="860" viewBox="0 0 1400 860" style="display:block;min-width:1400px">
+<defs>
+  <marker id="ar"  markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0.5 L0,6.5 L6,3.5 Z" fill="#dc2626"/></marker>
+  <marker id="ab"  markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0.5 L0,6.5 L6,3.5 Z" fill="#2563eb"/></marker>
+  <marker id="ag"  markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0.5 L0,6.5 L6,3.5 Z" fill="#16a34a"/></marker>
+  <marker id="ao"  markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0.5 L0,6.5 L6,3.5 Z" fill="#d97706"/></marker>
+  <marker id="as2" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0.5 L0,6.5 L6,3.5 Z" fill="#64748b"/></marker>
+</defs>
+
+<!-- ══════════════════════════════════════
+     РЯДОК 0 — ФІЗИЧНІ ОСОБИ (y=28)
+══════════════════════════════════════ -->
+
+<!-- КСЄНІЧ М.А. -->
+<g onclick="svp('ksenich_m')" style="cursor:pointer">
+  <rect x="28" y="28" width="155" height="58" rx="7" fill="#7f1d1d" stroke="#991b1b" stroke-width="1.5"/>
+  <text x="105" y="49" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="700" fill="#fecaca">КСЄНІЧ М.А.</text>
+  <text x="105" y="64" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#fca5a5">Батько · нерухомість</text>
+  <text x="105" y="78" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#f87171">вул. Полярна 8-Е</text>
+</g>
+
+<!-- ЗЕМЛЯНА Н.А. -->
+<g onclick="svp('zemlyana')" style="cursor:pointer">
+  <rect x="510" y="18" width="280" height="68" rx="9" fill="#7f1d1d" stroke="#991b1b" stroke-width="2"/>
+  <text x="650" y="42" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" fill="#fecaca">ЗЕМЛЯНА Н.А.</text>
+  <text x="650" y="58" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#fca5a5">РНОКПП 2042116787 · д.н. 29.11.1955</text>
+  <text x="650" y="72" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#f87171">Єдиний бенефіціар холдингу</text>
+</g>
+
+<!-- КСЄНІЧ К.М. -->
+<g onclick="svp('ksenich_k')" style="cursor:pointer">
+  <rect x="940" y="28" width="165" height="58" rx="7" fill="#7f1d1d" stroke="#991b1b" stroke-width="1.5"/>
+  <text x="1022" y="49" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="700" fill="#fecaca">КСЄНІЧ К.М.</text>
+  <text x="1022" y="64" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#fca5a5">Син · ном. дир. ФОКУСІТ</text>
+  <text x="1022" y="78" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#f87171">Засн. СКАЙІНС · дир. ROMASSET</text>
+</g>
+
+<!-- ЛОЗЕНКО Н.А. -->
+<g onclick="svp('lozenko')" style="cursor:pointer">
+  <rect x="1200" y="28" width="165" height="58" rx="7" fill="#7f1d1d" stroke="#991b1b" stroke-width="1.5"/>
+  <text x="1282" y="49" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="700" fill="#fecaca">ЛОЗЕНКО Н.А.</text>
+  <text x="1282" y="64" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#fca5a5">Ном. директорка М21</text>
+</g>
+
+<!-- ══════════════════════════════════════
+     РЯДОК 1 — ХОЛДИНГИ + ОСОБИСТІ (y=155)
+══════════════════════════════════════ -->
+
+<!-- Ксєніч М → М21 -->
+<line x1="72" y1="86" x2="72" y2="155" stroke="#d97706" stroke-width="1.5" marker-end="url(#ao)"/>
+<text x="78" y="122" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#d97706">100%</text>
+<!-- Ксєніч М → М41 -->
+<line x1="145" y1="86" x2="205" y2="155" stroke="#d97706" stroke-width="1.5" marker-end="url(#ao)"/>
+<text x="168" y="122" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#d97706">100%</text>
+
+<!-- М21 -->
+<g onclick="svp('m21')" style="cursor:pointer">
+  <rect x="28" y="155" width="130" height="68" rx="7" fill="#78350f" stroke="#92400e" stroke-width="1.5"/>
+  <text x="93" y="176" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="12" font-weight="700" fill="#fed7aa">М21</text>
+  <text x="93" y="191" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fdba74">40991786</text>
+  <text x="93" y="204" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fdba74">1.08 млн · 2016</text>
+  <text x="93" y="216" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#fb923c">Лозенко Р. (ном.)</text>
+</g>
+
+<!-- М41 -->
+<g onclick="svp('m41')" style="cursor:pointer">
+  <rect x="175" y="155" width="130" height="68" rx="7" fill="#78350f" stroke="#92400e" stroke-width="1.5"/>
+  <text x="240" y="176" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="12" font-weight="700" fill="#fed7aa">М41</text>
+  <text x="240" y="191" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fdba74">45702739</text>
+  <text x="240" y="204" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fdba74">6 млн · 2025</text>
+  <text x="240" y="216" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#fb923c">Степанюк Н. (ном.)</text>
+</g>
+
+<!-- Земляна → ФІТ 100% -->
+<line x1="580" y1="86" x2="500" y2="155" stroke="#dc2626" stroke-width="1.5" marker-end="url(#ar)"/>
+<text x="524" y="122" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#dc2626">100%</text>
+<!-- Земляна → ДС7 100% -->
+<line x1="650" y1="86" x2="650" y2="155" stroke="#dc2626" stroke-width="1.5" marker-end="url(#ar)"/>
+<text x="658" y="122" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#dc2626">100%</text>
+<!-- Земляна → ФОКУСІТ 90% -->
+<line x1="720" y1="86" x2="800" y2="155" stroke="#dc2626" stroke-width="1.5" marker-end="url(#ar)"/>
+<text x="776" y="122" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#dc2626">90%</text>
+
+<!-- ФІТ -->
+<g onclick="svp('fit')" style="cursor:pointer">
+  <rect x="400" y="155" width="185" height="72" rx="7" fill="#1e3a8a" stroke="#1e40af" stroke-width="1.5"/>
+  <text x="492" y="178" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" fill="#bfdbfe">ФІТ</text>
+  <text x="492" y="194" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#93c5fd">44434476</text>
+  <text x="492" y="208" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#93c5fd">72.7 млн грн</text>
+  <text x="492" y="220" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#60a5fa">Пилипак В. (ном.)</text>
+</g>
+
+<!-- ДС7 -->
+<g onclick="svp('ds7')" style="cursor:pointer">
+  <rect x="600" y="155" width="185" height="72" rx="7" fill="#1e3a8a" stroke="#1e40af" stroke-width="1.5"/>
+  <text x="692" y="178" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" fill="#bfdbfe">ДС7</text>
+  <text x="692" y="194" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#93c5fd">45498127</text>
+  <text x="692" y="208" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#93c5fd">10 тис грн</text>
+  <text x="692" y="220" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#60a5fa">Фрейлік О. (ном.)</text>
+</g>
+
+<!-- ФОКУСІТ -->
+<g onclick="svp('fokusit')" style="cursor:pointer">
+  <rect x="800" y="155" width="185" height="72" rx="7" fill="#1e3a8a" stroke="#1e40af" stroke-width="1.5"/>
+  <text x="892" y="178" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" fill="#bfdbfe">ФОКУСІТ</text>
+  <text x="892" y="194" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#93c5fd">45900452</text>
+  <text x="892" y="208" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#93c5fd">1 млн грн</text>
+  <text x="892" y="220" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#60a5fa">Ксєніч К.М. (ном.)</text>
+</g>
+
+<!-- Ксєніч К → СКАЙІНС -->
+<line x1="1022" y1="86" x2="1022" y2="155" stroke="#d97706" stroke-width="1.5" marker-end="url(#ao)"/>
+<text x="1030" y="122" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#d97706">100%</text>
+
+<!-- СКАЙІНС -->
+<g onclick="svp('skyins')" style="cursor:pointer">
+  <rect x="940" y="155" width="165" height="72" rx="7" fill="#78350f" stroke="#92400e" stroke-width="1.5"/>
+  <text x="1022" y="178" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="12" font-weight="700" fill="#fed7aa">СКАЙІНС</text>
+  <text x="1022" y="194" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#fdba74">46146734</text>
+  <text x="1022" y="208" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#fdba74">100 тис · IT</text>
+  <text x="1022" y="220" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fb923c">Ксєніч К.М.</text>
+</g>
+
+<!-- ROMASSET -->
+<g onclick="svp('romasset')" style="cursor:pointer">
+  <rect x="1120" y="155" width="175" height="72" rx="7" fill="#1e3a8a" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="1207" y="175" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#bfdbfe">ROMASSET HOLDINGS</text>
+  <text x="1207" y="189" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#93c5fd">CUI 52240197 · Румунія</text>
+  <text x="1207" y="202" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#93c5fd">засн. 29.07.2025</text>
+  <text x="1207" y="215" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#fbbf24">⚠ юр.адреса до 13.07.2026</text>
+  <text x="1207" y="221" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#93c5fd">Засн: Ксєніч В. · дир: Ксєніч К.</text>
+</g>
+
+<!-- Лозенко → ДТЗ -->
+<line x1="1282" y1="86" x2="1282" y2="155" stroke="#d97706" stroke-width="1.5" marker-end="url(#ao)"/>
+<text x="1290" y="122" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#d97706">100%</text>
+
+<!-- ДТЗ -->
+<g onclick="svp('dtz')" style="cursor:pointer">
+  <rect x="1200" y="155" width="175" height="72" rx="7" fill="#78350f" stroke="#92400e" stroke-width="1.5"/>
+  <text x="1287" y="176" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="12" font-weight="700" fill="#fed7aa">ДТЗ</text>
+  <text x="1287" y="191" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fdba74">43713670</text>
+  <text x="1287" y="204" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fdba74">500 тис · Страхування</text>
+  <text x="1287" y="217" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#fb923c">Лозенко Н.А. (вл./дир.)</text>
+  <text x="1287" y="222" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#fb923c">@dtz.in.ua — 6 компаній</text>
+</g>
+
+<!-- ══════════════════════════════════════
+     РЯДОК 2 — ПРОФПОСЕРЕДНИК (y=300)
+══════════════════════════════════════ -->
+
+<!-- ДС7 → ПРОФПОСЕРЕДНИК 50% -->
+<line x1="785" y1="191" x2="860" y2="191" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="860" y1="191" x2="900" y2="300" stroke="#2563eb" stroke-width="1.5" marker-end="url(#ab)"/>
+<text x="844" y="240" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#2563eb">50%</text>
+
+<!-- ФОКУСІТ → ПРОФПОСЕРЕДНИК 50% -->
+<line x1="892" y1="227" x2="950" y2="300" stroke="#1e40af" stroke-width="1.5" marker-end="url(#ab)"/>
+<text x="934" y="258" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#1e40af">50%</text>
+
+<!-- ПРОФПОСЕРЕДНИК -->
+<g onclick="svp('profpos')" style="cursor:pointer">
+  <rect x="840" y="300" width="210" height="82" rx="7" fill="#1e3a8a" stroke="#1e40af" stroke-width="1.5"/>
+  <text x="945" y="322" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="700" fill="#bfdbfe">ПРОФПОСЕРЕДНИК</text>
+  <text x="945" y="338" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#93c5fd">45722194</text>
+  <text x="945" y="352" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#93c5fd">10 тис грн</text>
+  <text x="945" y="366" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#60a5fa">Процюк І. (ном.)</text>
+</g>
+
+<!-- ══════════════════════════════════════
+     РЯДОК 3 — АМБЕР (y=460)
+══════════════════════════════════════ -->
+
+<!-- ПРОФПОСЕРЕДНИК → АМБЕР 56.10% -->
+<line x1="945" y1="382" x2="945" y2="420" stroke="#16a34a" stroke-width="1.5"/>
+<line x1="945" y1="420" x2="760" y2="420" stroke="#16a34a" stroke-width="1.5"/>
+<line x1="760" y1="420" x2="760" y2="460" stroke="#16a34a" stroke-width="1.5" marker-end="url(#ag)"/>
+<text x="855" y="413" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#16a34a">56.10%</text>
+
+<!-- СмартКонсалт → АМБЕР 43.90% (лінія з лівого блоку схеми) -->
+<line x1="310" y1="738" x2="310" y2="760" stroke="#16a34a" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="310" y1="760" x2="660" y2="760" stroke="#16a34a" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="660" y1="760" x2="660" y2="542" stroke="#16a34a" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="660" y1="542" x2="660" y2="460" stroke="#16a34a" stroke-width="1.5" marker-end="url(#ag)"/>
+<text x="590" y="455" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#16a34a">43.90%</text>
+
+<!-- АМБЕР -->
+<g onclick="svp('amber')" style="cursor:pointer">
+  <rect x="460" y="460" width="500" height="82" rx="9" fill="#14532d" stroke="#16a34a" stroke-width="2"/>
+  <text x="710" y="488" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="15" font-weight="700" fill="#bbf7d0">АМБЕР ТЕХНОЛОДЖІ</text>
+  <text x="710" y="504" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#86efac">45701803 · КБВ: Земляна 78.05% · Степанюк 21.95%</text>
+  <text x="710" y="520" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" fill="#4ade80">210.7 млн грн</text>
+  <text x="710" y="534" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#86efac">Директор: Кривченко В.П.</text>
+</g>
+
+<!-- ══════════════════════════════════════
+     РЯДОК 4 — ОСОБИСТІ (y=580+)
+══════════════════════════════════════ -->
+
+<!-- СТЕПАНЮК Н.О. -->
+<g onclick="svp('stepanyuk')" style="cursor:pointer">
+  <rect x="28" y="400" width="150" height="52" rx="7" fill="#7f1d1d" stroke="#991b1b" stroke-width="1.5"/>
+  <text x="103" y="421" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#fecaca">СТЕПАНЮК Н.О.</text>
+  <text x="103" y="438" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fca5a5">Ном. дир. М41</text>
+</g>
+
+<!-- Степанюк → ЦОП -->
+<line x1="103" y1="452" x2="103" y2="490" stroke="#d97706" stroke-width="1.5" marker-end="url(#ao)"/>
+<text x="109" y="473" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#d97706">100%</text>
+
+<!-- ЦОП -->
+<g onclick="svp('cop')" style="cursor:pointer">
+  <rect x="28" y="490" width="150" height="68" rx="7" fill="#78350f" stroke="#92400e" stroke-width="1.5"/>
+  <text x="103" y="511" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="12" font-weight="700" fill="#fed7aa">ЦОП</text>
+  <text x="103" y="526" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fdba74">45747009</text>
+  <text x="103" y="539" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fdba74">10 тис · Страхування</text>
+  <text x="103" y="551" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#fb923c">Ісаєв Д. (ном.)</text>
+</g>
+
+<!-- ЦОП → ФІНТЕХІНВЕСТ 10% -->
+<line x1="178" y1="524" x2="238" y2="524" stroke="#d97706" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#ao)"/>
+<text x="196" y="517" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="700" fill="#d97706">10%</text>
+
+<!-- ФІНТЕХІНВЕСТ -->
+<g onclick="svp('fintekh')" style="cursor:pointer">
+  <rect x="238" y="500" width="170" height="50" rx="7" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 3"/>
+  <text x="323" y="521" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#334155">ФІНТЕХІНВЕСТ</text>
+  <text x="323" y="535" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#64748b">45557433</text>
+  <text x="323" y="547" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#94a3b8">90% власників не розкрито</text>
+</g>
+
+<!-- БЛАЖІЄВСЬКИЙ В.М. -->
+<g onclick="svp('blazh')" style="cursor:pointer">
+  <rect x="28" y="590" width="150" height="52" rx="7" fill="#7f1d1d" stroke="#991b1b" stroke-width="1.5"/>
+  <text x="103" y="611" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#fecaca">БЛАЖІЄВСЬКИЙ В.М.</text>
+  <text x="103" y="628" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fca5a5">Боярка · консалтинг</text>
+</g>
+
+<!-- Блажієвський → БІЗСЕРВІСНЕО -->
+<line x1="103" y1="642" x2="103" y2="678" stroke="#d97706" stroke-width="1.5" marker-end="url(#ao)"/>
+<text x="109" y="663" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#d97706">100%</text>
+
+<!-- БІЗСЕРВІСНЕО -->
+<g onclick="svp('bsn')" style="cursor:pointer">
+  <rect x="28" y="678" width="160" height="68" rx="7" fill="#78350f" stroke="#92400e" stroke-width="1.5"/>
+  <text x="108" y="699" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="700" fill="#fed7aa">БІЗСЕРВІСНЕО</text>
+  <text x="108" y="714" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fdba74">46050199</text>
+  <text x="108" y="727" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fdba74">30 тис · Юридичні</text>
+  <text x="108" y="740" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#fb923c">Блажієвський (вл./дир.)</text>
+</g>
+
+<!-- ══════════════════════════════════════
+     СМАРТКОНСАЛТ — під ЦОП, компактно
+══════════════════════════════════════ -->
+
+<!-- ЦОП → СмартКонсалт 50% (горизонталь) -->
+<line x1="103" y1="558" x2="103" y2="580" stroke="#d97706" stroke-width="1.5"/>
+<line x1="103" y1="580" x2="238" y2="580" stroke="#d97706" stroke-width="1.5"/>
+<line x1="238" y1="580" x2="238" y2="660" stroke="#d97706" stroke-width="1.5" marker-end="url(#ao)"/>
+<text x="152" y="575" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="700" fill="#d97706">ЦОП 50%</text>
+
+<!-- ДС7 → СмартКонсалт 50% — коротка лінія зліва від схеми -->
+<line x1="600" y1="191" x2="420" y2="191" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="420" y1="191" x2="420" y2="640" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="420" y1="640" x2="370" y2="660" stroke="#2563eb" stroke-width="1.5" marker-end="url(#ab)"/>
+<text x="390" y="636" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="700" fill="#2563eb">ДС7 50%</text>
+
+<!-- СМАРТКОНСАЛТ -->
+<g onclick="svp('smartkonsalt')" style="cursor:pointer">
+  <rect x="210" y="660" width="200" height="78" rx="7" fill="#78350f" stroke="#92400e" stroke-width="1.5"/>
+  <text x="310" y="681" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="700" fill="#fed7aa">СмартКонсалт</text>
+  <text x="310" y="696" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fdba74">46092134</text>
+  <text x="310" y="709" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fdba74">100 тис · Право, консалт</text>
+  <text x="310" y="722" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#fb923c">КБВ: Калініченко Н.М.</text>
+  <text x="310" y="732" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#fbbf24">Агент АТ СК АРКС · №00025562</text>
+</g>
+
+<!-- ══════════════════════════════════════
+     SUMMARY BAR (y=800)
+══════════════════════════════════════ -->
+<rect x="0" y="800" width="1400" height="56" rx="0" fill="#1e293b"/>
+<text x="175" y="822" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" fill="#4ade80">210.7 млн грн</text>
+<text x="175" y="840" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#86efac">АМБЕР — найбільший актив</text>
+<text x="525" y="822" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" fill="#93c5fd">14</text>
+<text x="525" y="840" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#bfdbfe">компаній в групі (13 UA + 1 RO)</text>
+<text x="875" y="822" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" fill="#4ade80">✓ Продано</text>
+<text x="875" y="840" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#86efac">АМІДА ФК → Кузуб Т.О. 27.03.2026</text>
+<text x="1225" y="822" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" fill="#fbbf24">239 млн грн</text>
+<text x="1225" y="840" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fde68a">Загальний капітал групи</text>
+
+</svg>
+</div>
+
+<div class="sv-panel" id="sv-dp">
+  <button class="sv-pcl" onclick="svc()">✕</button>
+  <div id="sv-pc"></div>
+</div>
+
+</div>
+</div>
+
+
+
+<!-- ═══════════════════════════════════════════
+     ВКЛАДКА 3: БІБЛІОТЕКА ДОКУМЕНТІВ
+═══════════════════════════════════════════ -->
+<div id="tab-docs" class="tab-panel">
+<div class="lib-wrap">
+  <div class="lib-intro">Прямі посилання на папки OneDrive по кожній компанії · Клікни назву папки для переходу</div>
+  <div class="lib-grid" id="lib-grid"></div>
+</div>
+</div><!-- /tab-docs -->
+
+<!-- ═══════════════════════════════════════════
+     ВКЛАДКА 4: СПІВРОБІТНИКИ
+═══════════════════════════════════════════ -->
+<div id="tab-staff" class="tab-panel">
+<div class="staff-wrap">
+  <div id="staff-content"></div>
+</div>
+</div><!-- /tab-staff -->
+
+<!-- ═══════════════════════════════════════════
+     ВКЛАДКА 5: БАНКІВСЬКІ РАХУНКИ
+═══════════════════════════════════════════ -->
+<div id="tab-ibans" class="tab-panel">
+<div class="ibans-wrap">
+  <div class="ibans-filter-row">
+    <input class="ibans-search" id="ibans-q" type="text" placeholder="Пошук по компанії, ЄДРПОУ, IBAN, банку...">
+    <button id="ibans-toggle-closed" style="font-family:monospace;font-size:12px;background:#f1f5f9;border:1px solid #c4cad6;border-radius:3px;padding:6px 12px;cursor:pointer;color:#4a5568;">Сховати закриті</button>
+    <span class="ibans-count" id="ibans-count"></span>
+  </div>
+  <div id="ibans-accordion"></div>
+</div>
+</div><!-- /tab-ibans -->
+
+<!-- ═══════════════════════════════════════════
+     ВКЛАДКА 6: КВЕДи
+═══════════════════════════════════════════ -->
+<div id="tab-kveds" class="tab-panel">
+<div class="ibans-wrap">
+  <div class="ibans-filter-row">
+    <input class="ibans-search" id="kveds-q" type="text" placeholder="Пошук по компанії, коду або назві КВЕДу...">
+    <label style="font-family:monospace;font-size:12px;color:#4a5568;display:flex;align-items:center;gap:6px;cursor:pointer;">
+      <input type="checkbox" id="kveds-main-only" style="cursor:pointer;"> Тільки основні
+    </label>
+    <span class="ibans-count" id="kveds-count"></span>
+  </div>
+  <div id="kveds-accordion"></div>
+</div>
+</div><!-- /tab-kveds -->
+
+
+<script>
+/* ══════════════════════════════════════
+   TAB SWITCHING + СПІВРОБІТНИКИ
+══════════════════════════════════════ */
+var STAFF_DATA = [
+  { co:"amber", coName:"АМБЕР ТЕХНОЛОДЖІ", staff:[
+    {n:"Кривченко В.П.", r:"Директор (ЄДР)", edr:true}
+  ]},
+  { co:"bsn", coName:"БІЗСЕРВІСНЕО", staff:[
+    {n:"Блажієвський В.М.", r:"Директор (ЄДР)", edr:true}
+  ]},
+  { co:"jarvis", coName:"ДЖАРВИС", staff:[
+    {n:"Солохін В.Ю.", r:"Директор (ЄДР)", edr:true}
+  ]},
+  { co:"dtz", coName:"ДОБРОБУТ ТА ЗАХИСТ (ДТЗ)", staff:[
+    {n:"Лозенко Н.А.", r:"Директор (ЄДР)", edr:true},
+    {n:"Шелестюк О.Ю.", r:"Економіст з бухгалтерського обліку та аналізу господарської діяльності"}
+  ]},
+  { co:"ds7", coName:"ДС7", staff:[
+    {n:"Фрейлік О.А.", r:"Директор (ЄДР)", edr:true},
+    {n:"Лозенко Н.А.", r:"Керівник з реалізації страхових продуктів"},
+    {n:"Ксєніч О.К.", r:"Спеціаліст"},
+    {n:"Шевель Т.П.", r:""},
+    {n:"Маянчик О.В.", r:""}
+  ]},
+  { co:"m21", coName:"М21", staff:[
+    {n:"Лозенко Р.В.", r:"Директор (ЄДР)", edr:true}
+  ]},
+  { co:"m41", coName:"М41", staff:[
+    {n:"Степанюк Н.О.", r:"Директор (ЄДР)", edr:true}
+  ]},
+  { co:"profpos", coName:"ПРОФПОСЕРЕДНИК", staff:[
+    {n:"Процюк І.М.", r:"Директор (ЄДР)", edr:true},
+    {n:"Фрейлік Н.С.", r:"Менеджер з реклами"},
+    {n:"Ксєніч В.К.", r:"Керівник з реалізації страхових продуктів"},
+    {n:"Калініченко Н.М.", r:"Економіст"},
+    {n:"Солохін В.Ю.", r:"Юрист"}
+  ]},
+  { co:"skyins", coName:"СКАЙІНС", staff:[
+    {n:"Ксєніч К.М.", r:"Директор (ЄДР)", edr:true},
+    {n:"Заліська О.О.", r:""},
+    {n:"Ксєніч О.К.", r:""},
+    {n:"Шелестюк О.Ю.", r:""}
+  ]},
+  { co:"smart", coName:"СмартКонсалт", staff:[
+    {n:"Калініченко Н.М.", r:"Директор (ЄДР)", edr:true},
+    {n:"Солохін В.Ю.", r:"Юрист"},
+    {n:"Заліська О.О.", r:""},
+    {n:"Земляна Н.А.", r:""}
+  ]},
+  { co:"fit", coName:"ФІТ", staff:[
+    {n:"Пилипак В.В.", r:"Директор (ЄДР)", edr:true},
+    {n:"Ксєніч О.К.", r:"Фахівець з розробки та тестування програмного забезпечення"},
+    {n:"Лозенко Н.А.", r:"Менеджер по збуту"}
+  ]},
+  { co:"fokusit", coName:"ФОКУСІТ", staff:[
+    {n:"Ксєніч К.М.", r:"Директор (ЄДР)", edr:true},
+    {n:"Лозенко Н.А.", r:"Керівник з реалізації страхових продуктів"},
+    {n:"Шевель Т.П.", r:""},
+    {n:"Маянчик О.В.", r:""}
+  ]},
+  { co:"cop", coName:"ЦОП", staff:[
+    {n:"Ісаєв Д.І.", r:"Директор (ЄДР)", edr:true},
+    {n:"Фрейлік Н.С.", r:"Менеджер з реклами"},
+    {n:"Лозенко Н.А.", r:"Керівник з реалізації страхових продуктів"},
+    {n:"Солохін В.Ю.", r:"Юрист"}
+  ]},
+  { co:"romasset", coName:"ROMASSET HOLDINGS", staff:[
+    {n:"Ксєніч К.М.", r:"Директор (ЄДР)", edr:true}
+  ]}
+];
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'journals') jrn_initJournals();
+}
+
+/* ══════════════════════════════════════
+   ДОВІДНИК ЛОГІКА
+══════════════════════════════════════ */
+var COMPANIES = [
+  { id:"amber", name:"АМБЕР ТЕКНОЛОДЖІ", full:'ТОВ "АМБЕР ТЕКНОЛОДЖІ"', edrpou:"45701803", ipn:"265725113350", esv:"10000003057311", edr:"1000741020000109957", reg:"23.05.2025", cap:"210,732,393 грн", statute:"Модельний", addr:"01001, м. Київ, вул. Михайлівська, 24/11-13В", phone:"+38(063)-518-81-54", email:"ambertech@amida.in.ua", site:"", dir:"Кривченко Володимир Петрович", dirph:"", owners:[{p:"56.10%",n:"ПРОФПОСЕРЕДНИК",a:"118,219,282 грн"},{p:"43.90%",n:"СмартКонсалт",a:"92,513,111 грн"}], kbv:"Земляна Наталя Анатоліївна — 78.05% · Степанюк Надія Олександрівна — 21.95% (непрямий вирішальний вплив)", controls:[], kveds:[{c:"46.69",d:"оптова торгівля іншими машинами й устаткованням",m:1},{c:"46.90",d:"неспеціалізована оптова торгівля"},{c:"77.39",d:"надання в оренду інших машин, устатковання та товарів, н.в.і.у."}], ibans:[{i:"UA963005280000026001000053553",b:"ОТП БАНК",c:"Наталія",p:"050 724 24 60"},{i:"UA713220010000026005420000981",b:"Універсал Банк",c:"Ігнат Ілля",p:"+38 073 47 11 052"},{i:"UA233510050000026003879259163",b:'АТ "УКРСИББАНК"',c:"",p:"",closed:1}], notes:[{t:"n",x:"Головна операційна компанія (210.7 млн)"},{t:"n",x:"Засновники змінено: АМІДА ФК вийшла, нові частки — ПРОФПОСЕРЕДНИК 56.10% та СмартКонсалт 43.90% (ЄДР 01.04.2026)"},{t:"w",x:"Директор: Кривченко Володимир Петрович (виписка ЄДР 01.04.2026)"}] },
+  { id:"bsn", name:"БІЗСЕРВІСНЕО", full:'ТОВ "БІЗСЕРВІСНЕО"', edrpou:"46050199", ipn:"265025259604", esv:"10000003173706", edr:"1010741020000108844", reg:"13.10.2025", cap:"30,000 грн", statute:"Модельний", addr:"03038, м. Київ, вул. Амосова Миколи, 12, офіс 12", phone:"+38(093)-168-19-14", email:"bsn@dtz.in.ua", site:"", dir:"Блажієвський Володимир Миколайович", dirph:"+380 50 776 8888 / +380992693875", owners:[{p:"100%",n:"Блажієвський Володимир Миколайович",a:"30,000 грн"}], kbv:"Блажієвський Володимир Миколайович — 100%", controls:[], kveds:[{c:"69.10",d:"діяльність у сфері права",m:1},{c:"66.22",d:"діяльність страхових агентів і брокерів"},{c:"70.22",d:"консультування з питань комерційної діяльності й керування"}], ibans:[], noIban:1, notes:[{t:"w",x:"IBAN відсутній — рахунки ще не відкрито"}] },
+  { id:"jarvis", name:"ДЖАРВИС", full:'ТОВ "ДЖАРВИС"', edrpou:"46370383", ipn:"265726069236", esv:"10000003275761", edr:"1010351020000024195", reg:"27.03.2026", cap:"100,000 грн", statute:"Модельний", addr:"01032, м. Київ, вул. Жилянська, 126/23, офіс 220", phone:"+38(063)-973-94-92", email:"jarvis@dtz.in.ua", site:"", dir:"Солохін Віктор Юрійович", dirph:"+380639739492", owners:[{p:"100%",n:"Калініченко Надія Миколаївна",a:"100,000 грн"}], kbv:"Калініченко Надія Миколаївна — 100% (прямий вирішальний вплив)", controls:[], kveds:[{c:"69.20",d:"діяльність у сфері бухгалтерського обліку й аудиту; консультування з питань оподаткування",m:1},{c:"66.19",d:"інша допоміжна діяльність у сфері фінансових послуг"},{c:"66.21",d:"оцінювання ризиків та завданої шкоди"},{c:"66.22",d:"діяльність страхових агентів і брокерів"},{c:"66.29",d:"інша допоміжна діяльність у сфері страхування та пенсійного забезпечення"},{c:"69.10",d:"діяльність у сфері права"},{c:"70.22",d:"консультування з питань комерційної діяльності й керування"},{c:"82.11",d:"надання комбінованих офісних адміністративних послуг"},{c:"82.20",d:"діяльність телефонних центрів"},{c:"82.99",d:"надання інших допоміжних комерційних послуг, н.в.і.у."}], ibans:[{i:"UA553220010000026003700014826",b:"Універсал Банк",c:"",p:""},{i:"UA143510050000026000879284841",b:"УкрСиббанк",c:"",p:""}], notes:[{t:"n",x:"Зареєстровано 27.03.2026 (ЄДР запис 1010351020000024195)"},{t:"n",x:"Засновниця: Калініченко Надія Миколаївна (РНОКПП 2910802283, д.н. 11.09.1979)"}] },
+  { id:"dtz", name:"ДОБРОБУТ ТА ЗАХИСТ (ДТЗ)", full:'ТОВ "ДОБРОБУТ ТА ЗАХИСТ"', edrpou:"43713670", ipn:"265520158990", esv:"10000001837401", edr:"10701020000088245", reg:"16.07.2020", cap:"500,000 грн", statute:"Власний", addr:"01014, м. Київ, вул. Катерини Білокур, 10/15, офіс 9", phone:"+38(093)-581-55-81", email:"broker@dtz.in.ua", site:"https://www.dtz.in.ua", dir:"Лозенко Наталя Анатоліївна", dirph:"", owners:[{p:"100%",n:"Лозенко Наталя Анатоліївна",a:"500,000 грн"}], kbv:"Лозенко Наталя Анатоліївна — 100%", controls:[], kveds:[{c:"66.22",d:"діяльність страхових агентів і брокерів",m:1},{c:"66.21",d:"оцінювання ризиків та завданої шкоди"},{c:"66.29",d:"інша допоміжна діяльність у сфері страхування та пенсійного забезпечення"}], ibans:[{i:"UA973003350000000260072203827",b:"Райффайзен Банк",c:"",p:""},{i:"UA953348510000000026007334999",b:"ПУМБ",c:"",p:""},{i:"UA343220010000026002420000876",b:"Універсал Банк",c:"Ігнат Ілля",p:"+38 073 47 11 052"},{i:"UA293806340000026008289024001",b:"КБ АКОРДБАНК",c:"",p:""},{i:"UA033220010000026000420000920",b:"Універсал Банк",c:"спецрахунок",p:""}], notes:[{t:"n",x:"Страховий брокер"},{t:"n",x:"Постачальник IT-інфраструктури для групи (спільний домен @dtz.in.ua)"}] },
+  { id:"ds7", name:"ДС7", full:'ТОВ "ДС7"', edrpou:"45498127", ipn:"265924088582", esv:"10000002777747", edr:"1000741020000106583", reg:"04.04.2024", cap:"10,000 грн", statute:"Модельний", addr:"04050, м. Київ, вул. Білоруська, будинок 30", phone:"+38(093)-119-63-15", email:"ds7@dtz.in.ua", site:"https://ds7.dtz.in.ua/", dir:"Фрейлік Оксана Анатоліївна", dirph:"", owners:[{p:"100%",n:"Земляна Наталя Анатоліївна",a:"10,000 грн"}], kbv:"Земляна Наталя Анатоліївна — 100% (прямий вирішальний вплив)", controls:[{n:"ФОКУСІТ",p:"10%"},{n:"ПРОФПОСЕРЕДНИК",p:"50%"},{n:"СмартКонсалт",p:"50%"}], kveds:[{c:"62.01",d:"комп'ютерне програмування",m:1},{c:"62.09",d:"інша діяльність у сфері інформаційних технологій і комп'ютерних систем"},{c:"63.11",d:"оброблення даних, розміщення інформації на веб-вузлах і пов'язана з ними діяльність"},{c:"63.12",d:"веб-портали"},{c:"66.21",d:"оцінювання ризиків та завданої шкоди"},{c:"66.22",d:"діяльність страхових агентів і брокерів"},{c:"66.29",d:"інша допоміжна діяльність у сфері страхування та пенсійного забезпечення"},{c:"68.32",d:"управління нерухомим майном за винагороду або на основі контракту"},{c:"70.22",d:"консультування з питань комерційної діяльності й керування"},{c:"73.11",d:"рекламні агентства"},{c:"73.20",d:"дослідження кон'юнктури ринку та виявлення громадської думки"},{c:"81.21",d:"загальне прибирання будинків"},{c:"82.30",d:"організування конгресів і торговельних виставок"}], ibans:[{i:"UA153057490000026005000021117",b:"Банк Кредит Дніпро",c:"",p:""},{i:"UA033220010000026003420001012",b:"Універсал Банк",c:"Ігнат Ілля",p:"+38 073 47 11 052"},{i:"UA733005280000026007000053472",b:"ОТП БАНК",c:"Наталія",p:"050 724 24 60"},{i:"UA733510050000026002879250925",b:'АТ "УКРСИББАНК"',c:"",p:"",closed:1}], notes:[{t:"n",x:"Мінімальний капітал (10 тис), але ключова роль у структурі"},{t:"n",x:"Частка в АМІДА ФК (20.80%) продана Кузуб Т.О. 27.03.2026 за 3,000 грн (договір підписано)"},{t:"n",x:"Виписка ЄДР оновлена: 01.04.2026"}] },
+  { id:"m21", name:"М21", full:'ТОВ "М21"', edrpou:"40991786", ipn:"265916230375", esv:"10000000774016", edr:"10741020000063485", reg:"30.11.2016", cap:"1,080,505 грн", statute:"Власний", addr:"01001, м. Київ, вул. Михайлівська, 24/11В", phone:"+380445815581", email:"m21@dtz.in.ua", site:"", dir:"Лозенко Роман Вікторович", dirph:"", owners:[{p:"100%",n:"Ксєніч Михайло Антонович",a:"1,080,505 грн"}], kbv:"Ксєніч Михайло Антонович — 100%", controls:[], kveds:[{c:"41.10",d:"організація будівництва будівель",m:1},{c:"68.20",d:"надання в оренду й експлуатацію власного чи орендованого нерухомого майна"}], ibans:[{i:"UA493510050000026007637151700",b:"УкрСиббанк",c:"",p:""}], notes:[{t:"n",x:"Нерухомість, будівництво"}] },
+  { id:"m41", name:"М41", full:'ТОВ "М41"', edrpou:"45702739", ipn:"265025023212", esv:"10000002984817", edr:"1000701020000103506", reg:"31.01.2025", cap:"6,000,000 грн", statute:"Модельний", addr:"01104, м. Київ, вул. Катерини Білокур, 10/15, офіс 9", phone:"+38(093)-328-64-58", email:"m41@dtz.in.ua", site:"", dir:"Степанюк Надія Олександрівна", dirph:"+380 67 804 3371", owners:[{p:"100%",n:"Ксєніч Михайло Антонович",a:"6,000,000 грн"}], kbv:"Ксєніч Михайло Антонович — 100%", controls:[], kveds:[{c:"68.20",d:"надання в оренду й експлуатацію власного чи орендованого нерухомого майна",m:1},{c:"41.10",d:"організація будівництва будівель"}], ibans:[{i:"UA813510050000026003879249098",b:"УкрСиббанк",c:"Єгор",p:"+380676154848"}], notes:[{t:"n",x:"Нерухомість, оренда"},{t:"w",x:"Був у Держреєстрі фінустанов — виключено з власної ініціативи 15.01.2025"}] },
+  { id:"profpos", name:"ПРОФПОСЕРЕДНИК", full:'ТОВ "ПРОФПОСЕРЕДНИК"', edrpou:"45722194", ipn:"265025037916", esv:"10000002996214", edr:"1000701020000103677", reg:"19.02.2025", cap:"10,000 грн", statute:"Модельний", addr:"01104, м. Київ, вул. Підвисоцького Професора, будинок 16", phone:"+38(093)-269-16-54", email:"profi@dtz.in.ua", site:"", dir:"Процюк Ігор Миколайович", dirph:"+380 66 373 65 23", owners:[{p:"50%",n:"ДС7",a:"5,000 грн"},{p:"50%",n:"ФОКУСІТ",a:"5,000 грн"}], kbv:"Земляна Наталя Анатоліївна — 100% (непрямий вирішальний вплив)", controls:[{n:"АМБЕР ТЕКНОЛОДЖІ",p:"56.10%"}], kveds:[{c:"70.22",d:"консультування з питань комерційної діяльності й керування",m:1},{c:"62.02",d:"консультування з питань інформатизації"},{c:"62.09",d:"інша діяльність у сфері інформаційних технологій і комп'ютерних систем"},{c:"63.11",d:"оброблення даних, розміщення інформації на веб-вузлах і пов'язана з ними діяльність"},{c:"63.12",d:"веб-портали"},{c:"63.99",d:"надання інших інформаційних послуг, н.в.і.у."},{c:"66.21",d:"оцінювання ризиків та завданої шкоди"},{c:"66.22",d:"діяльність страхових агентів і брокерів"},{c:"66.29",d:"інша допоміжна діяльність у сфері страхування та пенсійного забезпечення"},{c:"69.10",d:"діяльність у сфері права"},{c:"69.20",d:"діяльність у сфері бухгалтерського обліку й аудиту; консультування з питань оподаткування"},{c:"73.11",d:"рекламні агентства"},{c:"73.12",d:"посередництво в розміщенні реклами в засобах масової інформації"},{c:"74.90",d:"інша професійна, наукова та технічна діяльність, н.в.і.у."},{c:"78.10",d:"діяльність агентств працевлаштування"},{c:"82.11",d:"надання комбінованих офісних адміністративних послуг"},{c:"82.20",d:"діяльність телефонних центрів"},{c:"82.99",d:"надання інших допоміжних комерційних послуг, н.в.і.у."},{c:"85.59",d:"інші види освіти, н.в.і.у."},{c:"85.60",d:"допоміжна діяльність у сфері освіти"}], ibans:[{i:"UA083510050000026009879250014",b:"УкрСиббанк",c:"Олена",p:"093 366 51 78"},{i:"UA503005280000026008000052591",b:"ОТП БАНК",c:"Наталія",p:"050 724 24 60"}], notes:[{t:"n",x:"Посередницька компанія, 56.10% АМБЕР ТЕХНОЛОДЖІ (ЄДР 01.04.2026)"},{t:"n",x:"Договір цесії: АМІДА відступає 2,346,411.53 грн вимог до ФАБРИКА ВВ"},{t:"n",x:"Виписка ЄДР оновлена: 01.04.2026"}] },
+  { id:"skyins", name:"СКАЙІНС", full:'ТОВ "СКАЙІНС"', edrpou:"46146734", ipn:"102925286449", esv:"10000003195136", edr:"1010351020000019952", reg:"08.11.2025", cap:"100,000 грн", statute:"Модельний", addr:"07403, Київська обл., Броварський р-н, м. Бровари, вул. Москаленка Сергія, будинок 19Б, офіс 1", phone:"+38(093)-741-69-88", email:"skyins@dtz.in.ua", site:"", dir:"Ксєніч Костянтин Михайлович", dirph:"", owners:[{p:"100%",n:"Ксєніч Костянтин Михайлович",a:"100,000 грн"}], kbv:"Ксєніч Костянтин Михайлович — 100% (прямий вирішальний вплив)", controls:[], kveds:[{c:"62.02",d:"консультування з питань інформатизації",m:1},{c:"58.29",d:"видання іншого програмного забезпечення"},{c:"62.01",d:"комп'ютерне програмування"},{c:"62.03",d:"діяльність із керування комп'ютерним устаткованням"},{c:"62.09",d:"інша діяльність у сфері інформаційних технологій і комп'ютерних систем"},{c:"63.11",d:"оброблення даних, розміщення інформації на веб-вузлах і пов'язана з ними діяльність"},{c:"63.12",d:"веб-портали"},{c:"63.99",d:"надання інших інформаційних послуг, н.в.і.у."},{c:"73.11",d:"рекламні агентства"},{c:"73.12",d:"посередництво в розміщенні реклами в засобах масової інформації"}], ibans:[{i:"UA123220010000026004700009067",b:"Універсал Банк",c:"вхід",p:"+380736441212"},{i:"UA723005280000026000000056153",b:"ОТП БАНК",c:"",p:""}], notes:[{t:"n",x:"IT консалтинг. Ксєніч К. також директор ФОКУСІТ"},{t:"n",x:"Виписка ЄДР оновлена: 01.04.2026"}] },
+  { id:"smart", name:"СМАРТКОНСАЛТ", full:'ТОВ "СмартКонсалт"', edrpou:"46092134", ipn:"265725285199", esv:"10000003194152", edr:"1010351020000019905", reg:"06.11.2025", cap:"100,000 грн", statute:"Модельний", addr:"03113, м. Київ, пр. Берестейський, будинок 57, офіс 5", phone:"+38(093)-168-19-14", email:"smart@dtz.in.ua", site:"", dir:"Калініченко Надія Миколаївна", dirph:"", owners:[{p:"50%",n:"ЦОП",a:"50,000 грн"},{p:"50%",n:"ДС7",a:"50,000 грн"}], kbv:"Земляна Наталя Анатоліївна — 50% · Степанюк Надія Олександрівна — 50% (непрямий вирішальний вплив)", controls:[{n:"АМБЕР ТЕКНОЛОДЖІ",p:"43.90%"}], kveds:[{c:"69.10",d:"діяльність у сфері права",m:1},{c:"66.19",d:"інша допоміжна діяльність у сфері фінансових послуг, крім страхування та пенсійного забезпечення"},{c:"66.21",d:"оцінювання ризиків та завданої шкоди"},{c:"66.22",d:"діяльність страхових агентів і брокерів"},{c:"66.29",d:"інша допоміжна діяльність у сфері страхування та пенсійного забезпечення"},{c:"70.22",d:"консультування з питань комерційної діяльності й керування"},{c:"82.11",d:"надання комбінованих офісних адміністративних послуг"},{c:"82.20",d:"діяльність телефонних центрів"}], ibans:[{i:"UA373220010000026007700009194",b:"Універсал Банк",c:"вхід",p:"+380674459484"},{i:"UA273003460000026004000019666",b:"Сенс Банк",c:"",p:""}], notes:[{t:"n",x:"Де-факто в групі КМ через ДС7 (50%). Email: smart@dtz.in.ua"},{t:"n",x:"НБУ реєстр посередників: рег.№ 00025562, включена 19.03.2026, страховий агент АТ «СК «АРКС» (20474912)"},{t:"n",x:"43.90% АМБЕР ТЕКНОЛОДЖІ (92,513,111 грн) — зафіксовано в ЄДР 01.04.2026"},{t:"n",x:"КБВ підтверджено випискою ЄДР від 02.04.2026: Земляна Н.А. 50% + Степанюк Н.О. 50% (непрямий вирішальний вплив)"}] },
+  { id:"fit", name:"ФІТ", full:'ТОВ "ФІНАНСОВІ ІНФОРМАЦІЙНІ ТЕХНОЛОГІЇ"', edrpou:"44434476", ipn:"265921331110", esv:"10000002231600", edr:"1000741020000099540", reg:"13.12.2021", cap:"72,660,984 грн", statute:"Власний", addr:"01001, м. Київ, вул. Михайлівська, будинок 24/11В", phone:"+38(063)-280-60-85", email:"admin@oserwin.net", site:"", dir:"Пилипак Василь Васильович", dirph:"+380737000739 / +380 50 604 9657", owners:[{p:"100%",n:"Земляна Наталя Анатоліївна",a:"72,660,984 грн"}], kbv:"Земляна Наталя Анатоліївна — 100% (прямий вирішальний вплив)", controls:[], kveds:[{c:"46.69",d:"оптова торгівля іншими машинами й устаткованням",m:1},{c:"46.90",d:"неспеціалізована оптова торгівля"},{c:"62.01",d:"комп'ютерне програмування"},{c:"62.09",d:"інша діяльність у сфері інформаційних технологій і комп'ютерних систем"},{c:"63.11",d:"оброблення даних, розміщення інформації на веб-вузлах і пов'язана з ними діяльність"},{c:"63.12",d:"веб-портали"},{c:"66.21",d:"оцінювання ризиків та завданої шкоди"},{c:"66.22",d:"діяльність страхових агентів і брокерів"},{c:"66.29",d:"інша допоміжна діяльність у сфері страхування та пенсійного забезпечення"},{c:"77.39",d:"надання в оренду інших машин, устатковання та товарів, н.в.і.у."}], ibans:[{i:"UA093806340000026005288244001",b:"КБ АКОРДБАНК",c:"Олена",p:"+380674590033"},{i:"UA673003350000000260052200057",b:"Райффайзен Банк",c:"",p:""},{i:"UA353005280000026003000054680",b:"ОТП БАНК",c:"",p:""},{i:"UA123510050000026001879261272",b:'АТ "УКРСИББАНК"',c:"UAH",p:"",closed:1},{i:"UA223510050000026007879261276",b:'АТ "УКРСИББАНК"',c:"USD",p:"",closed:1},{i:"UA833510050000026009879261274",b:'АТ "УКРСИББАНК"',c:"EUR",p:"",closed:1}], notes:[{t:"n",x:"Холдингова компанія Земляної Н.А."},{t:"n",x:"Частка в АМІДА ФК (79.20%) продана 27.03.2026, зміни зареєстровані в ЄДР 01.04.2026"},{t:"n",x:"Виписка ЄДР оновлена: 01.04.2026"}] },
+  { id:"fokusit", name:"ФОКУСІТ", full:'ТОВ "ФОКУСІТ"', edrpou:"45900452", ipn:"265924298918", esv:"10000002948805", edr:"1000741020000108434", reg:"19.11.2024", cap:"1,000,000 грн", statute:"Модельний", addr:"01001, м. Київ, вул. Михайлівська, будинок 24/11В", phone:"+38(093)-950-27-03", email:"admin@oserwin.net", site:"https://focusit.dtz.in.ua/", dir:"Ксєніч Костянтин Михайлович", dirph:"", owners:[{p:"90%",n:"Земляна Наталя Анатоліївна",a:"900,000 грн"},{p:"10%",n:"ДС7",a:"100,000 грн"}], kbv:"Земляна Наталя Анатоліївна — 90% (прямий та непрямий вирішальний вплив)", controls:[{n:"ПРОФПОСЕРЕДНИК",p:"50%"}], kveds:[{c:"62.01",d:"комп'ютерне програмування",m:1},{c:"62.02",d:"консультування з питань інформатизації"},{c:"62.03",d:"діяльність із керування комп'ютерним устаткованням"},{c:"62.09",d:"інша діяльність у сфері інформаційних технологій і комп'ютерних систем"},{c:"63.11",d:"оброблення даних, розміщення інформації на веб-вузлах і пов'язана з ними діяльність"},{c:"63.12",d:"веб-портали"},{c:"63.99",d:"надання інших інформаційних послуг, н.в.і.у."},{c:"66.19",d:"інша допоміжна діяльність у сфері фінансових послуг, крім страхування та пенсійного забезпечення"},{c:"66.21",d:"оцінювання ризиків та завданої шкоди"},{c:"66.22",d:"діяльність страхових агентів і брокерів"},{c:"66.29",d:"інша допоміжна діяльність у сфері страхування та пенсійного забезпечення"},{c:"70.22",d:"консультування з питань комерційної діяльності й керування"},{c:"82.99",d:"надання інших допоміжних комерційних послуг, н.в.і.у."}], ibans:[{i:"UA933510050000026001879242451",b:"УкрСиббанк",c:"Єгор",p:"+380676154848"},{i:"UA063005280000026008000050861",b:"ОТП БАНК",c:"",p:""},{i:"UA433804410000026002001258401",b:"Кредитвест Банк",c:"",p:""}], notes:[{t:"n",x:"Виписка ЄДР оновлена: 01.04.2026"}] },
+  { id:"cop", name:"ЦОП", full:'ТОВ "ЦЕНТР ОБСЛУГОВУВАННЯ ПОСЕРЕДНИКІВ"', edrpou:"45747009", ipn:"265725033901", esv:"10000002993032", edr:"1000741020000109072", reg:"13.02.2025", cap:"10,000 грн", statute:"Модельний", addr:"01001, м. Київ, вул. Михайлівська, будинок 24/11В", phone:"+38(093)-305-33-23", email:"isc@dtz.in.ua", site:"https://cop.dtz.in.ua/", dir:"Ісаєв Денис Ігорович", dirph:"+380 97 325 22 32", owners:[{p:"100%",n:"Степанюк Надія Олександрівна",a:"10,000 грн"}], kbv:"Степанюк Надія Олександрівна — 100% (прямий вирішальний вплив)", controls:[], kveds:[{c:"66.22",d:"діяльність страхових агентів і брокерів",m:1},{c:"62.01",d:"комп'ютерне програмування"},{c:"62.02",d:"консультування з питань інформатизації"},{c:"62.09",d:"інша діяльність у сфері інформаційних технологій і комп'ютерних систем"},{c:"63.11",d:"оброблення даних, розміщення інформації на веб-вузлах і пов'язана з ними діяльність"},{c:"63.12",d:"веб-портали"},{c:"66.19",d:"інша допоміжна діяльність у сфері фінансових послуг, крім страхування та пенсійного забезпечення"},{c:"69.10",d:"діяльність у сфері права"},{c:"70.22",d:"консультування з питань комерційної діяльності й керування"},{c:"73.11",d:"рекламні агентства"},{c:"73.20",d:"дослідження кон'юнктури ринку та виявлення громадської думки"},{c:"82.99",d:"надання інших допоміжних комерційних послуг, н.в.і.у."}], ibans:[{i:"UA413510050000026005879250041",b:"УкрСиббанк",c:"Єгор",p:"+380676154848"},{i:"UA363805260000026007001970444",b:"КБ Глобус",c:"",p:""}], notes:[{t:"n",x:"Страхове посередництво · 10% ФІНТЕХІНВЕСТ (45557433)"},{t:"n",x:"Виписка ЄДР оновлена: 01.04.2026"}] },
+  { id:"romasset", name:"ROMASSET HOLDINGS 🇷🇴", full:"ROMASSET HOLDINGS S.R.L.", edrpou:"CUI 52240197", ipn:"", esv:"", edr:"J2025056615006", reg:"29.07.2025", cap:"200 LEI", statute:"Modell unic", addr:"Municipiul Iași, Str. Podișului, Nr. 14I, Județ Iași", phone:"0745647316", dir:"Xenici Constantin (Ксєніч К.М.)", dirph:"", owners:[{p:"100%",n:"Xenici Vladimir (Ксєніч Володимир) — нар. 15.02.2000",a:"200 LEI"}], kbv:"Ксєніч Костянтин Михайлович (адміністратор, повноваження до 14.07.2045)", controls:[], kveds:[{c:"6421",d:"Activități ale holding-urilor (холдингова діяльність)",m:1},{c:"7020",d:"Consultanță în afaceri și management"}], ibans:[], noIban:1, notes:[{t:"w",x:"⚠ Термін дії юридичної адреси — до 13.07.2026. Необхідно продовжити або змінити адресу"},{t:"n",x:"Румунія (ЄС). Засновник — Ксєніч Володимир (син КМ). EUID: ROONRC.J2025056615006"}] }
+];
+
+
+function buildText(c) {
+  var parts = [c.id, c.name, c.full, c.edrpou, c.ipn, c.esv, c.edr, c.reg, c.cap, c.addr, c.phone, c.dir, c.dirph, c.kbv];
+  for (var i=0;i<c.owners.length;i++) parts.push(c.owners[i].p, c.owners[i].n);
+  for (var i=0;i<c.controls.length;i++) parts.push(c.controls[i].n, c.controls[i].p);
+  for (var i=0;i<c.kveds.length;i++) parts.push(c.kveds[i].c, c.kveds[i].d);
+  for (var i=0;i<c.ibans.length;i++) parts.push(c.ibans[i].i, c.ibans[i].b, c.ibans[i].c, c.ibans[i].p);
+  for (var i=0;i<c.notes.length;i++) parts.push(c.notes[i].x);
+  return parts.join(" ").toLowerCase();
+}
+var TEXT_INDEX = {};
+for (var i=0;i<COMPANIES.length;i++) TEXT_INDEX[COMPANIES[i].id] = buildText(COMPANIES[i]);
+
+function h(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function renderCard(c) {
+  var ownersHtml = "";
+  for (var i=0;i<c.owners.length;i++) ownersHtml += '<div class="info-row"><span class="info-label">'+h(c.owners[i].n)+'</span><span class="info-value" style="text-align:right"><span style="font-family:monospace;font-weight:700;color:#1e4fa0">'+h(c.owners[i].p)+'</span><br><span style="font-family:monospace;font-size:11px;color:#8a95a8">'+h(c.owners[i].a)+'</span></span></div>';
+  var ctrlHtml = "";
+  if (c.controls.length) { ctrlHtml = '<div style="margin-top:12px;padding-top:10px;border-top:1px solid #dde1e9"><div class="section-title" style="margin-bottom:8px">Контролює</div>'; for (var i=0;i<c.controls.length;i++) ctrlHtml += '<div class="info-row"><span class="info-label">'+h(c.controls[i].n)+'</span><span class="info-value" style="font-family:monospace;font-weight:700;color:#16a34a">'+h(c.controls[i].p)+'</span></div>'; ctrlHtml += '</div>'; }
+  var notesHtml = "";
+  if (c.notes.length) { notesHtml = '<div style="margin-top:10px"><div class="section-title" style="margin-bottom:6px">Примітки</div>'; for (var i=0;i<c.notes.length;i++) { var cls = c.notes[i].t==="a" ? "note-alert" : c.notes[i].t==="w" ? "note-warn" : "note-normal"; notesHtml += '<div class="note-item '+cls+'">'+h(c.notes[i].x)+'</div>'; } notesHtml += '</div>'; }
+  var kvedHtml = "";
+  for (var i=0;i<c.kveds.length;i++) { var km = c.kveds[i].m ? " kved-main" : ""; kvedHtml += '<div class="kved-item'+km+'"><span class="kved-code">'+h(c.kveds[i].c)+'</span><span class="kved-desc">'+(c.kveds[i].m?"★ ":"")+h(c.kveds[i].d)+'</span></div>'; }
+  var ibanHtml = c.noIban ? '<div style="color:#8a95a8;font-size:14px">Відкритих рахунків не має</div>' : '<table class="iban-table"><thead><tr><th>IBAN</th><th>Банк</th><th>Контакт</th></tr></thead><tbody>';
+  if (!c.noIban) { for (var i=0;i<c.ibans.length;i++) { ibanHtml += '<tr><td class="iban-code">'+h(c.ibans[i].i)+'</td><td>'+h(c.ibans[i].b)+'</td><td>'+(c.ibans[i].c?h(c.ibans[i].c)+' ':'')+(c.ibans[i].p?'<span class="iban-phone">'+h(c.ibans[i].p)+'</span>':'')+'</td></tr>'; } ibanHtml += '</tbody></table>'; }
+  // Підраховуємо статистику для плашки
+  var activeIbans = c.noIban ? 0 : (c.ibans ? c.ibans.filter(function(x){ return !x.closed; }).length : 0);
+  var staffCount = 0;
+  for (var si=0; si<STAFF_DATA.length; si++) { if (STAFF_DATA[si].co===c.id) { staffCount = STAFF_DATA[si].staff.length; break; } }
+  // директор завжди +1 якщо є
+  var totalStaff = staffCount + (c.dir ? 1 : 0);
+  // якщо директор вже є в STAFF_DATA — не дублюємо
+  if (staffCount > 0) totalStaff = staffCount;
+
+  return '<div class="company-card" id="card-'+h(c.id)+'">'
+    +'<div class="company-header" data-id="'+c.id+'" onclick="toggle(this.dataset.id)">'
+    +'<div><div class="company-name">'+h(c.name)+'  <span class="badge-edr">'+h(c.edrpou)+'</span></div><div class="company-fullname">'+h(c.full)+'</div></div>'
+    +'<div class="badges">'
+    +'<div class="card-stats">'
+    +(activeIbans > 0 ? '<span class="card-stat">🏦 <span>'+activeIbans+'</span></span>' : '')
+    +'<span class="card-stat">💰 <span>'+h(c.cap)+'</span></span>'
+    +(totalStaff > 0 ? '<span class="card-stat">👤 <span>'+totalStaff+'</span></span>' : '')
+    +'</div>'
+    +'<span class="arrow down" id="arrow-'+h(c.id)+'">▾</span>'
+    +'</div>'
+    +'</div>'
+    +'<div class="company-body" id="body-'+h(c.id)+'">'
+    +'<div class="body-grid">'
+    +'<div class="info-section"><div class="section-title">Реєстрація</div>'
+    +'<div class="info-row"><span class="info-label">ЄДРПОУ</span><span class="edrpou-val">'+h(c.edrpou)+'</span></div>'
+    +'<div class="info-row"><span class="info-label">Дата реєстрації</span><span class="info-value">'+h(c.reg)+'</span></div>'
+    +(c.edr?'<div class="info-row"><span class="info-label">Запис ЄДР</span><span class="info-value mono" style="font-size:12px">'+h(c.edr)+'</span></div>':'')
+    +'<div class="info-row"><span class="info-label">Капітал</span><span class="info-value"><strong>'+h(c.cap)+'</strong></span></div>'
+    +(c.ipn?'<div class="info-row"><span class="info-label">ІПН</span><span class="info-value mono">'+h(c.ipn)+'</span></div>':'')
+    +(c.esv?'<div class="info-row"><span class="info-label">ЄСВ</span><span class="info-value mono">'+h(c.esv)+'</span></div>':'')
+    +'<div class="info-row"><span class="info-label">Статут</span><span class="info-value">'+h(c.statute)+'</span></div></div>'
+    +'<div class="info-section"><div class="section-title">Власність</div>'+ownersHtml+'<div class="info-row" style="margin-top:8px"><span class="info-label">КБВ</span><span class="info-value kbv-val">'+h(c.kbv)+'</span></div>'+ctrlHtml+'</div>'
+    +'<div class="info-section" style="border-right:none"><div class="section-title">Управління та адреса</div>'
+    +'<div class="info-row"><span class="info-label">Директор</span><span class="info-value">'+h(c.dir)+'</span></div>'
+    +(c.dirph?'<div class="info-row"><span class="info-label">Тел. директора</span><span class="info-value mono" style="color:#b04000">'+h(c.dirph)+'</span></div>':'')
+    +'<div class="info-row"><span class="info-label">Адреса</span><span class="info-value">'+h(c.addr)+'</span></div>'
+    +(c.phone?'<div class="info-row"><span class="info-label">Телефон</span><span class="info-value mono">'+h(c.phone)+'</span></div>':'')
+    +(c.email?'<div class="info-row"><span class="info-label">Email</span><span class="info-value"><a href="mailto:'+h(c.email)+'" style="color:#1e4fa0;text-decoration:none">'+h(c.email)+'</a></span></div>':'')
+    +(c.site?'<div class="info-row"><span class="info-label">Сайт</span><span class="info-value"><a href="'+h(c.site)+'" target="_blank" style="color:#1e4fa0;text-decoration:none">'+h(c.site)+'</a></span></div>':'')
+    +notesHtml+'</div></div>'
+    +'<div class="full-section"><div class="section-title">КВЕДи</div><div class="kved-grid">'+kvedHtml+'</div></div>'
+    +'<div class="full-section"><div class="section-title">Банківські рахунки (IBAN)</div>'+ibanHtml+'</div>'
+    +buildStaffSection(c.id)
+    +'</div></div>'
+    +'</div></div>';
+}
+
+
+function toggle(id) {
+  var body = document.getElementById("body-"+id), arrow = document.getElementById("arrow-"+id);
+  if (body.classList.contains("open")) { body.classList.remove("open"); arrow.className="arrow down"; }
+  else { body.classList.add("open"); arrow.className="arrow up"; }
+}
+
+function goto(id) {
+  // Закриваємо всі відкриті картки
+  document.querySelectorAll('.company-body.open').forEach(function(b) {
+    b.classList.remove('open');
+  });
+  document.querySelectorAll('.arrow.up').forEach(function(a) {
+    a.className = 'arrow down';
+  });
+  // Відкриваємо потрібну
+  var body = document.getElementById("body-"+id);
+  var arrow = document.getElementById("arrow-"+id);
+  if (body) body.classList.add("open");
+  if (arrow) arrow.className = "arrow up";
+  var el = document.getElementById("card-"+id)||document.getElementById(id);
+  if (el) setTimeout(function(){
+    var top = el.getBoundingClientRect().top + window.pageYOffset - 66;
+    window.scrollTo({top: top, behavior: 'smooth'});
+  }, 50);
+}
+
+function doSearch() {
+  var q = document.getElementById("q").value.trim().toLowerCase();
+  var notFound = document.getElementById("notFound"), resultDiv = document.getElementById("searchResult"), found = 0;
+  for (var i=0;i<COMPANIES.length;i++) {
+    var c=COMPANIES[i], card=document.getElementById("card-"+c.id), sl=document.getElementById("sl-"+c.id);
+    if (!q || TEXT_INDEX[c.id].indexOf(q) >= 0) {
+      card.classList.remove("hidden"); if(sl) sl.classList.remove("dimmed");
+      if (q) { document.getElementById("body-"+c.id).classList.add("open"); document.getElementById("arrow-"+c.id).className="arrow up"; }
+      found++;
+    } else {
+      card.classList.add("hidden"); if(sl) sl.classList.add("dimmed");
+    }
+  }
+  if (q) {
+    resultDiv.style.display="block"; resultDiv.textContent="Знайдено: "+found+" з "+COMPANIES.length;
+    notFound.style.display = found===0 ? "block" : "none";
+    if (found===0) notFound.textContent='Нічого не знайдено за запитом «'+q+'»';
+  } else {
+    resultDiv.style.display="none"; notFound.style.display="none";
+    for (var i=0;i<COMPANIES.length;i++) { document.getElementById("body-"+COMPANIES[i].id).classList.remove("open"); document.getElementById("arrow-"+COMPANIES[i].id).className="arrow down"; }
+  }
+}
+
+/* ══════════════════════════════════════
+   СХЕМА — SIDE PANEL
+══════════════════════════════════════ */
+var SV_DATA = {
+  zemlyana:{name:"ЗЕМЛЯНА НАТАЛЯ АНАТОЛІЇВНА",edrpou:"РНОКПП 2042116787 · д.н. 29.11.1955",badges:[{t:"Фізична особа",c:"sv-br"},{t:"Єдиний бенефіціар",c:"sv-br"}],s:[{l:"Адреса",v:"Київ, вул. Гірника Олекси, 4/6"},{l:"Пряма власність",v:"ФІТ 100% · ДС7 100% · ФОКУСІТ 90%"},{l:"Контроль через ланцюг",v:"АМІДА 100% · АМБЕР ≈90.25% · ПРОФПОСЕРЕДНИК 100%"},{l:"Капітал під контролем",v:">320 млн грн"}],info:"Єдиний бенефіціар через: ФІТ + ДС7 + ФОКУСІТ → АМІДА → АМБЕР."},
+  fit:{name:"ФІТ",edrpou:"ЄДРПОУ: 44434476",badges:[{t:"Холдингова",c:"sv-bb"},{t:"Активна",c:"sv-bg"}],s:[{l:"Власниця",v:"Земляна Н.А. 100%"},{l:"Директор",v:"Пилипак Василь (номінальний)"},{l:"Капітал",v:"72,660,984 грн"},{l:"Адреса",v:"Київ, Михайлівська 24/11В"},{l:"Тел.",v:"+38(063)-280-60-85"}],info:"Частка в АМІДА ФК (79.20%) продана 27.03.2026. Зміни зареєстровані ЄДР 01.04.2026."},
+  ds7:{name:"ДС7",edrpou:"ЄДРПОУ: 45498127",badges:[{t:"Холдингова",c:"sv-bb"}],s:[{l:"Власниця",v:"Земляна Н.А. 100%"},{l:"Директорка",v:"Фрейлік О. (номінальна)"},{l:"Капітал",v:"10,000 грн"},{l:"Контролює",v:"10% ФОКУСІТ · 50% ПРОФПОСЕРЕДНИК · 50% СмартКонсалт"}],info:"Частка в АМІДА ФК (20.80%) продана Кузуб Т.О. 27.03.2026."},
+  fokusit:{name:"ФОКУСІТ",edrpou:"ЄДРПОУ: 45900452",badges:[{t:"Холдингова",c:"sv-bb"}],s:[{l:"Власники",v:"Земляна 90% · ДС7 10%"},{l:"Директор",v:"Ксєніч К.М. (номінальний)"},{l:"Капітал",v:"1,000,000 грн"},{l:"IBAN",v:"UA063005280000026008000050861 · ОТП БАНК"},{l:"Контролює",v:"50% ПРОФПОСЕРЕДНИК"}]},
+  amida:{name:"АМІДА ФК",edrpou:"ЄДРПОУ: 40656531",badges:[{t:"Холдингова",c:"sv-bb"},{t:"⚠ Закриття",c:"sv-br"}],s:[{l:"Власники",v:"ФІТ 79.20% · ДС7 20.80%"},{l:"КБВ",v:"Земляна Н.А. 100%"},{l:"Директорка",v:"Грудковська Аліна (номінальна)"},{l:"Капітал",v:"97,135,000 грн"},{l:"Регулятор",v:"Виключена з Держреєстру 12.03.2026"},{l:"Контролює",v:"АМБЕР 61.68%"}],warn:"Виключена з Держреєстру фінустанов 12.03.2026 (рішення НБУ №21/150-рк). ВЕЛАР ІНВЕСТ вийшов (ЄДР 19.03.2026). Планова перевірка — квітень 2026."},
+  profpos:{name:"ПРОФПОСЕРЕДНИК",edrpou:"ЄДРПОУ: 45722194",badges:[{t:"Холдингова",c:"sv-bb"}],s:[{l:"Власники",v:"ДС7 50% · ФОКУСІТ 50%"},{l:"КБВ",v:"Земляна Н.А. 100%"},{l:"Директор",v:"Процюк Ігор (від 19.01.2026)"},{l:"IBAN",v:"UA503005280000026008000052591 · ОТП БАНК"},{l:"Контролює",v:"56.10% АМБЕР ТЕХНОЛОДЖІ"}],info:"Основний акціонер АМБЕР ТЕХНОЛОДЖІ (56.10%) після виходу АМІДА ФК 01.04.2026."},
+  amber:{name:"АМБЕР ТЕХНОЛОДЖІ",edrpou:"ЄДРПОУ: 45701803",badges:[{t:"Операційна",c:"sv-bg"},{t:"210.7 млн грн",c:"sv-bg"}],s:[{l:"Власники",v:"ПРОФПОСЕРЕДНИК 56.10% · СмартКонсалт 43.90%"},{l:"КБВ",v:"Земляна Н.А. 78.05% · Степанюк Н.О. 21.95%"},{l:"Директор",v:"Кривченко Володимир Петрович"},{l:"Капітал",v:"210,732,393 грн"},{l:"Email",v:"ambertech@amida.in.ua"}],info:"Засновники змінено 01.04.2026: АМІДА ФК вийшла, нові частки — ПРОФПОСЕРЕДНИК 56.10% та СмартКонсалт 43.90%."},
+  cop:{name:"ЦОП",edrpou:"ЄДРПОУ: 45747009",badges:[{t:"Особиста",c:"sv-ba"}],s:[{l:"Власниця",v:"Степанюк Н.О. 100%"},{l:"Директор",v:"Ісаєв Денис (номінальний)"},{l:"IBAN",v:"UA413510050000026005879250041 · УкрСиббанк"},{l:"Участь",v:"10% ФІНТЕХІНВЕСТ (45557433)"}]},
+  cop2:{name:"ЦОП",edrpou:"ЄДРПОУ: 45747009",badges:[{t:"Особиста",c:"sv-ba"}],s:[{l:"Власниця",v:"Степанюк Н.О. 100%"},{l:"Директор",v:"Ісаєв Денис (номінальний)"},{l:"IBAN",v:"UA413510050000026005879250041 · УкрСиббанк"}]},
+  fintekh:{name:"ФІНТЕХІНВЕСТ",edrpou:"ЄДРПОУ: 45557433",badges:[{t:"Структура уточнюється",c:"sv-ba"}],s:[{l:"Відомі власники",v:"ЦОП — 10%"},{l:"Решта 90%",v:"Не розкрито"}],warn:"Потрібна виписка з ЄДР."},
+  romasset:{name:"ROMASSET HOLDINGS S.R.L.",edrpou:"CUI 52240197 · Румунія",badges:[{t:"ЄС",c:"sv-bb"},{t:"Холдингова",c:"sv-bb"}],s:[{l:"Засновник",v:"Ксєніч Володимир (100%, 200 LEI)"},{l:"Адміністратор",v:"Ксєніч К.М. (до 14.07.2045)"},{l:"Засн.",v:"29.07.2025 · Ясси (Iași)"},{l:"EUID",v:"ROONRC.J2025056615006"}],warn:"Термін юридичної адреси — до 13.07.2026."},
+  ksenich_m:{name:"КСЄНІЧ МИХАЙЛО АНТОНОВИЧ",edrpou:"Батько · нерухомість",badges:[{t:"Фізична особа",c:"sv-ba"}],s:[{l:"Адреса",v:"Київ, вул. Полярна, 8-Е, кв. 107"},{l:"Компанії",v:"М21 (100%) · М41 (100%)"},{l:"Капітал",v:"≈7.08 млн грн"}]},
+  m21:{name:"М21",edrpou:"ЄДРПОУ: 40991786",badges:[{t:"Особиста",c:"sv-ba"},{t:"Нерухомість",c:"sv-ba"}],s:[{l:"Власник",v:"Ксєніч М.А. 100%"},{l:"Директор",v:"Лозенко Роман (номінальний)"},{l:"Капітал",v:"1,080,505 грн"},{l:"IBAN",v:"UA493510050000026007637151700 · УкрСиббанк"}]},
+  m41:{name:"М41",edrpou:"ЄДРПОУ: 45702739",badges:[{t:"Особиста",c:"sv-ba"},{t:"Нерухомість",c:"sv-ba"}],s:[{l:"Власник",v:"Ксєніч М.А. 100%"},{l:"Директорка",v:"Степанюк Надія (номінальна)"},{l:"Капітал",v:"6,000,000 грн"},{l:"IBAN",v:"UA813510050000026003879249098 · УкрСиббанк"}],info:"Виключено з реєстру фінустанов 15.01.2025."},
+  ksenich_k:{name:"КСЄНІЧ КОСТЯНТИН МИХАЙЛОВИЧ",edrpou:"Син · КМ",badges:[{t:"Фізична особа",c:"sv-ba"},{t:"Ном. дир. ФОКУСІТ",c:"sv-bb"}],s:[{l:"Адреса",v:"Київ, вул. Полярна, 8-Е, кв. 107"},{l:"Власні компанії",v:"СКАЙІНС (100%)"},{l:"Номінальний директор",v:"ФОКУСІТ (45900452)"},{l:"Адміністратор",v:"ROMASSET HOLDINGS (до 14.07.2045)"}]},
+  skyins:{name:"СКАЙІНС",edrpou:"ЄДРПОУ: 46146734",badges:[{t:"Особиста",c:"sv-ba"},{t:"IT",c:"sv-bb"}],s:[{l:"Власник / Директор",v:"Ксєніч К.М. 100%"},{l:"Капітал",v:"100,000 грн"},{l:"Адреса",v:"Бровари, Москаленка 19Б, оф. 1"},{l:"IBAN",v:"UA723005280000026000000056153 · ОТП БАНК"}]},
+  lozenko:{name:"ЛОЗЕНКО НАТАЛЯ АНАТОЛІЇВНА",edrpou:"Власниця ДТЗ",badges:[{t:"Фізична особа",c:"sv-ba"}],s:[{l:"Адреса",v:"Київська обл., с. Требухів, вул. Миру, 51"},{l:"Компанії",v:"ДТЗ 100%"},{l:"Роль",v:"Номінальна директорка М21"}]},
+  dtz:{name:"ДОБРОБУТ ТА ЗАХИСТ (ДТЗ)",edrpou:"ЄДРПОУ: 43713670",badges:[{t:"Особиста",c:"sv-ba"},{t:"@dtz.in.ua",c:"sv-bb"}],s:[{l:"Власниця / Директорка",v:"Лозенко Наталя 100%"},{l:"Капітал",v:"500,000 грн"},{l:"Тел.",v:"+38(093)-581-55-81"},{l:"Домен",v:"@dtz.in.ua — ДТЗ · ПРОФПОСЕРЕДНИК · СКАЙІНС · М41 · ЦОП · СмартКонсалт"}],info:"Спільна email-інфраструктура 6 компаній групи."},
+  stepanyuk:{name:"СТЕПАНЮК НАДІЯ ОЛЕКСАНДРІВНА",edrpou:"Власниця ЦОП",badges:[{t:"Фізична особа",c:"sv-ba"}],s:[{l:"Адреса",v:"Київ, вул. Миколайчука, 17/1, кв. 71"},{l:"Компанії",v:"ЦОП 100%"},{l:"Роль",v:"Номінальна директорка М41"}]},
+  jarvis:{name:"ДЖАРВИС",edrpou:"ЄДРПОУ: 46370383",badges:[{t:"Особиста",c:"sv-ba"},{t:"Нова",c:"sv-bg"}],s:[{l:"Засновниця / КБВ",v:"Калініченко Н.М. 100%"},{l:"Директор",v:"Солохін Віктор Юрійович"},{l:"Капітал",v:"100,000 грн"},{l:"Адреса",v:"Київ, вул. Жилянська, 126/23, оф. 220"},{l:"IBAN",v:"UA553220010000026003700014826 · Універсал Банк"},{l:"IBAN",v:"UA143510050000026000879284841 · УкрСиббанк"},{l:"Email",v:"jarvis@dtz.in.ua"},{l:"Тел.",v:"+380639739492"}]},
+  kalinichenko:{name:"КАЛІНІЧЕНКО НАДІЯ МИКОЛАЇВНА",edrpou:"КБВ та директорка СмартКонсалт · засновниця ДЖАРВИС",badges:[{t:"Фізична особа",c:"sv-ba"},{t:"КБВ 100%",c:"sv-bb"}],s:[{l:"Адреса",v:"Київ, вул. Ростиславська, 5-Б, кв. 298"},{l:"Тел.",v:"+38(067)-445-94-84"},{l:"Email",v:"nadya_kn@ukr.net / n.kalinichenko@dtz.in.ua"},{l:"Компанії",v:"СмартКонсалт (КБВ/дир.) · ДЖАРВИС (засновниця 100%)"}]},
+  smartkonsalt:{name:"СмартКонсалт",edrpou:"ЄДРПОУ: 46092134",badges:[{t:"Особиста",c:"sv-ba"},{t:"Активна",c:"sv-bg"},{t:"НБУ агент",c:"sv-bb"}],s:[{l:"Засновники",v:"ЦОП 50% · ДС7 50%"},{l:"КБВ / Директорка",v:"Калініченко Н.М. 100%"},{l:"Капітал",v:"100,000 грн"},{l:"Адреса",v:"Київ, пр. Берестейський, 57, оф. 5"},{l:"Email",v:"smart@dtz.in.ua"},{l:"НБУ реєстр",v:"рег.№ 00025562 · включена 19.03.2026"},{l:"Контролює",v:"43.90% АМБЕР ТЕХНОЛОДЖІ (92,513,111 грн)"}],info:"43.90% АМБЕР ТЕХНОЛОДЖІ зафіксовано в ЄДР 01.04.2026. Зареєстрована в реєстрі страхових посередників НБУ як страховий агент АТ «СК «АРКС»."},
+  blazh:{name:"БЛАЖІЄВСЬКИЙ ВОЛОДИМИР МИКОЛАЙОВИЧ",edrpou:"Власник БІЗСЕРВІСНЕО",badges:[{t:"Фізична особа",c:"sv-ba"}],s:[{l:"Адреса",v:"Київська обл., Боярка, вул. Кібенка, 144"},{l:"Тел.",v:"+380 50 776 8888"},{l:"Компанії",v:"БІЗСЕРВІСНЕО 100%"}]},
+  bsn:{name:"БІЗСЕРВІСНЕО",edrpou:"ЄДРПОУ: 46050199",badges:[{t:"Особиста",c:"sv-ba"},{t:"Юридичні",c:"sv-ba"}],s:[{l:"Власник / Директор",v:"Блажієвський В.М. 100%"},{l:"Капітал",v:"30,000 грн"},{l:"Адреса",v:"Київ, вул. Амосова, 12, оф. 12"},{l:"Тел.",v:"+380 50 776 8888"}],warn:"IBAN відсутній — рахунки не відкрито."}
+};
+
+function svp(id) {
+  var d = SV_DATA[id]; if (!d) return;
+  var h2 = function(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");};
+  var html = '<div class="sv-ph2">'+h2(d.name)+'</div><div class="sv-pedr">'+h2(d.edrpou)+'</div>';
+  if (d.badges) { html += '<div style="margin-bottom:8px">'; d.badges.forEach(function(b){html+='<span class="sv-badge '+b.c+'">'+h2(b.t)+'</span>';}); html+='</div>'; }
+  html += '<div class="sv-pdiv"></div>';
+  if (d.s) d.s.forEach(function(s){html+='<div class="sv-ps"><div class="sv-pl">'+h2(s.l)+'</div><div class="sv-pv">'+h2(s.v)+'</div></div>';});
+  if (d.warn) html += '<div class="sv-wbox">⚠ '+h2(d.warn)+'</div>';
+  if (d.info) html += '<div class="sv-ibox">ℹ '+h2(d.info)+'</div>';
+  document.getElementById('sv-pc').innerHTML = html;
+  document.getElementById('sv-dp').classList.add('open');
+}
+function svc() { document.getElementById('sv-dp').classList.remove('open'); }
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') svc(); });
+
+/* ══════════════════════════════════════
+   INIT
+══════════════════════════════════════ */
+function buildStaffSection(coId) {
+  var sd = null;
+  for (var i=0;i<STAFF_DATA.length;i++) { if (STAFF_DATA[i].co===coId) { sd=STAFF_DATA[i]; break; } }
+  if (!sd || !sd.staff.length) return '';
+  var rows = '';
+  for (var i=0;i<sd.staff.length;i++) {
+    var s = sd.staff[i];
+    rows += '<tr><td class="staff-name">'+h(s.n)+'</td><td class="staff-role">'+(s.r?h(s.r):'—')+'</td></tr>';
+  }
+  return '<div class="full-section"><div class="section-title">Співробітники</div>'
+    +'<table class="staff-table"><thead><tr><th>ПІБ</th><th>Посада</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+}
+
+function staffToggle(id) {
+  var body = document.getElementById('staff-body-'+id);
+  var arrow = document.getElementById('staff-arrow-'+id);
+  if (!body) return;
+  var isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  if (arrow) arrow.classList.toggle('up', !isOpen);
+}
+
+function renderStaffTab() {
+  var wrap = document.getElementById('staff-content');
+  if (!wrap) return;
+
+  var html = '<div style="padding:12px 0 16px;display:flex;align-items:center;gap:12px">'
+    +'<input class="ibans-search" id="staff-q" type="text" placeholder="Пошук по імені, компанії, посаді..." style="width:340px">'
+    +'</div>';
+
+  for (var i=0;i<STAFF_DATA.length;i++) {
+    var sd = STAFF_DATA[i];
+    var co = null;
+    for (var ci=0;ci<COMPANIES.length;ci++) { if (COMPANIES[ci].id===sd.co) { co=COMPANIES[ci]; break; } }
+    var edrpou = co ? co.edrpou : '';
+    var dir = '';
+    var totalCount = sd.staff.length;
+    for (var j=0;j<sd.staff.length;j++) {
+      if (sd.staff[j].edr) dir = sd.staff[j].n;
+    }
+
+    html += '<div class="ibank-block staff-company-section" id="staff-'+h(sd.co)+'" data-co="'+h(sd.coName)+'">';
+    html += '<div class="ibank-head" onclick="staffToggle(this.dataset.id)" data-id="'+h(sd.co)+'">'
+      +'<div>'
+      +'<span class="ibank-co">'+h(sd.coName)+'</span>'
+      +(edrpou ? '<span class="ibank-edr">'+h(edrpou)+'</span>' : '')
+      +'</div>'
+      +'<div class="ibank-meta">'
+      +(dir ? '<span style="font-family:monospace;font-size:12px;font-weight:600;color:#1e4fa0;margin-right:12px">Дир.: '+h(dir)+'</span>' : '')
+      +'<span class="ibank-badge-count">'+totalCount+' осіб</span>'
+      +'<span class="ibank-arrow" id="staff-arrow-'+h(sd.co)+'">▾</span>'
+      +'</div>'
+      +'</div>';
+
+    html += '<div class="ibank-body" id="staff-body-'+h(sd.co)+'">'
+      +'<table class="ibank-table"><thead><tr><th>ПІБ</th><th>Посада</th></tr></thead><tbody>';
+    for (var j=0;j<sd.staff.length;j++) {
+      var s = sd.staff[j];
+      var dirStyle = s.edr ? ' style="background:#f0f4ff;font-weight:600"' : '';
+      var dirBadge = s.edr ? ' <span style="font-family:monospace;font-size:10px;background:#1e4fa0;color:#fff;border-radius:3px;padding:1px 5px">ЄДР</span>' : '';
+      html += '<tr data-name="'+h(s.n)+'"'+dirStyle+'>'
+        +'<td>'+h(s.n)+'</td>'
+        +'<td>'+(s.r?h(s.r):'—')+dirBadge+'</td>'
+        +'</tr>';
+    }
+    html += '</tbody></table></div></div>';
+  }
+
+  wrap.innerHTML = html;
+  document.getElementById('staff-q').addEventListener('input', function() {
+    var q = this.value.trim().toLowerCase();
+    document.querySelectorAll('.staff-company-section').forEach(function(sec) {
+      var coMatch = sec.dataset.co.toLowerCase().indexOf(q)>=0;
+      var anyRow = false;
+      sec.querySelectorAll('tr[data-name]').forEach(function(tr) {
+        var show = !q || coMatch || tr.dataset.name.toLowerCase().indexOf(q)>=0 || tr.textContent.toLowerCase().indexOf(q)>=0;
+        tr.style.display = show ? '' : 'none';
+        if (show) anyRow = true;
+      });
+      var visible = !q || coMatch || anyRow;
+      sec.style.display = visible ? '' : 'none';
+      if (q && visible) {
+        var body = sec.querySelector('.ibank-body');
+        var arrow = sec.querySelector('.ibank-arrow');
+        if (body) body.classList.add('open');
+        if (arrow) arrow.classList.add('up');
+      }
+    });
+  });
+}
+
+window.onload = function() {
+  var container = document.getElementById("cards"), html = "";
+  for (var i=0;i<COMPANIES.length;i++) html += renderCard(COMPANIES[i]);
+  container.innerHTML = html;
+  renderStaffTab();
+  renderIbansTab();
+  renderKvedsTab();
+  document.getElementById("q").addEventListener("input", doSearch);
+  document.getElementById("q").addEventListener("keyup", doSearch);
+};
+
+/* ══════════════════════════════════════
+   БАНКІВСЬКІ РАХУНКИ
+══════════════════════════════════════ */
+function renderIbansTab() {
+  var wrap = document.getElementById('ibans-accordion');
+  var countEl = document.getElementById('ibans-count');
+  if (!wrap) return;
+
+  // Збираємо дані по компаніях
+  var groups = [];
+  for (var i = 0; i < COMPANIES.length; i++) {
+    var c = COMPANIES[i];
+    if (!c.ibans || !c.ibans.length) continue;
+    var ibans = c.ibans.map(function(x) {
+      return { iban: x.i, bank: x.b, curr: x.c || '', closed: x.closed ? 1 : 0 };
+    });
+    groups.push({ id: c.id, co: c.name, full: c.full, edr: c.edrpou, ibans: ibans });
+  }
+
+  var showClosed = true;
+
+  function buildAccordion(list) {
+    var html = '';
+    var totalActive = 0, totalClosed = 0;
+    list.forEach(function(g) {
+      var visible = g.ibans.filter(function(r){ return showClosed || !r.closed; });
+      if (!visible.length) return;
+      var active = visible.filter(function(r){ return !r.closed; }).length;
+      var closed = visible.filter(function(r){ return r.closed; }).length;
+      totalActive += active;
+      totalClosed += closed;
+      var countBadge = '<span class="ibank-badge-count">' + active + ' діючих'
+        + (closed ? ' · <span style="color:#94a3b8">' + closed + ' закрито</span>' : '')
+        + '</span>';
+      var rows = '';
+      visible.forEach(function(r) {
+        var tr = r.closed ? ' class="closed"' : '';
+        var closedBadge = r.closed ? '<span class="ibans-badge-closed">закрито</span>' : '';
+        var currBadge = r.curr ? '<span class="ibank-curr">' + h(r.curr) + '</span>' : '';
+        rows += '<tr' + tr + '>'
+          + '<td style="font-size:12px;color:#4a5568;white-space:nowrap">' + h(g.full) + '</td>'
+          + '<td class="ibank-edr" style="white-space:nowrap">' + h(g.edr) + '</td>'
+          + '<td class="ibank-iban">' + h(r.iban) + closedBadge + '</td>'
+          + '<td class="ibank-bank">' + h(r.bank) + currBadge + '</td>'
+          + '</tr>';
+      });
+      html += '<div class="ibank-block" id="ibank-' + h(g.id) + '">'
+        + '<div class="ibank-head" onclick="ibankToggle(\'' + g.id + '\')">'
+        +   '<div><span class="ibank-co">' + h(g.co) + '</span><span class="ibank-edr">' + h(g.edr) + '</span></div>'
+        +   '<div class="ibank-meta">' + countBadge + '<span class="ibank-arrow" id="ibank-arrow-' + h(g.id) + '">▾</span></div>'
+        + '</div>'
+        + '<div class="ibank-body" id="ibank-body-' + h(g.id) + '">'
+        +   '<table class="ibank-table"><thead><tr><th>Назва (скорочена)</th><th>ЄДРПОУ</th><th>IBAN</th><th>Банк</th></tr></thead><tbody>' + rows + '</tbody></table>'
+        + '</div>'
+        + '</div>';
+    });
+    wrap.innerHTML = html;
+    countEl.innerHTML = 'Діючих: <b>' + totalActive + '</b> &nbsp;·&nbsp; Закритих: <b>' + totalClosed + '</b>';
+  }
+
+  function applyFilter(q) {
+    var filtered = !q ? groups : groups.map(function(g) {
+      var ibans = g.ibans.filter(function(r) {
+        return g.co.toLowerCase().indexOf(q) >= 0
+          || g.edr.toLowerCase().indexOf(q) >= 0
+          || r.iban.toLowerCase().indexOf(q) >= 0
+          || r.bank.toLowerCase().indexOf(q) >= 0;
+      });
+      return ibans.length ? { id: g.id, co: g.co, edr: g.edr, ibans: ibans } : null;
+    }).filter(Boolean);
+    buildAccordion(filtered);
+    // Якщо є пошук — розкриваємо всі
+    if (q) {
+      filtered.forEach(function(g) {
+        var body = document.getElementById('ibank-body-' + g.id);
+        var head = document.querySelector('#ibank-' + g.id + ' .ibank-head');
+        var arrow = document.getElementById('ibank-arrow-' + g.id);
+        if (body) body.classList.add('open');
+        if (head) head.classList.add('open');
+        if (arrow) arrow.classList.add('up');
+      });
+    }
+  }
+
+  applyFilter('');
+
+  document.getElementById('ibans-q').addEventListener('input', function() {
+    applyFilter(this.value.trim().toLowerCase());
+  });
+
+  var toggleBtn = document.getElementById('ibans-toggle-closed');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', function() {
+      showClosed = !showClosed;
+      this.textContent = showClosed ? 'Сховати закриті' : 'Показати закриті';
+      applyFilter(document.getElementById('ibans-q').value.trim().toLowerCase());
+    });
+  }
+}
+
+function ibankToggle(id) {
+  var body = document.getElementById('ibank-body-' + id);
+  var head = document.querySelector('#ibank-' + id + ' .ibank-head');
+  var arrow = document.getElementById('ibank-arrow-' + id);
+  if (!body) return;
+  var isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  if (head) head.classList.toggle('open', !isOpen);
+  if (arrow) arrow.classList.toggle('up', !isOpen);
+}
+
+/* ══════════════════════════════════════
+   КВЕДи
+══════════════════════════════════════ */
+function renderKvedsTab() {
+  var wrap = document.getElementById('kveds-accordion');
+  var countEl = document.getElementById('kveds-count');
+  var searchEl = document.getElementById('kveds-q');
+  var mainOnlyEl = document.getElementById('kveds-main-only');
+  if (!wrap) return;
+
+  // Збираємо дані по компаніях
+  var groups = [];
+  for (var i = 0; i < COMPANIES.length; i++) {
+    var c = COMPANIES[i];
+    if (!c.kveds || !c.kveds.length) continue;
+    groups.push({ id: c.id, co: c.name, edr: c.edrpou, kveds: c.kveds });
+  }
+
+  function buildAccordion(list) {
+    var html = '';
+    var totalMain = 0, totalAll = 0;
+    list.forEach(function(g) {
+      if (!g.kveds.length) return;
+      var mainKved = g.kveds.filter(function(k){ return k.m; });
+      var mainCount = mainKved.length;
+      var total = g.kveds.length;
+      totalMain += mainCount;
+      totalAll += total;
+
+      var countBadge = '<span class="ibank-badge-count">'
+        + '<span style="color:#16a34a;font-weight:700">' + mainCount + ' основних</span>'
+        + ' · ' + total + ' всього'
+        + '</span>';
+
+      var rows = '';
+      g.kveds.forEach(function(k) {
+        var mainMark = k.m
+          ? '<span style="font-family:monospace;font-size:9px;background:#dcfce7;color:#14532d;border:1px solid #86efac;border-radius:3px;padding:1px 5px;margin-left:6px;">★ основний</span>'
+          : '';
+        rows += '<tr>'
+          + '<td style="font-family:monospace;font-size:12px;font-weight:700;color:#1e4fa0;white-space:nowrap">' + h(k.c) + '</td>'
+          + '<td style="font-size:13px;color:#1a1d23">' + h(k.d) + mainMark + '</td>'
+          + '</tr>';
+      });
+
+      html += '<div class="ibank-block" id="kved-' + h(g.id) + '">'
+        + '<div class="ibank-head" onclick="kvedToggle(\'' + g.id + '\')">'
+        +   '<div><span class="ibank-co">' + h(g.co) + '</span><span class="ibank-edr">' + h(g.edr) + '</span></div>'
+        +   '<div class="ibank-meta">' + countBadge + '<span class="ibank-arrow" id="kved-arrow-' + h(g.id) + '">▾</span></div>'
+        + '</div>'
+        + '<div class="ibank-body" id="kved-body-' + h(g.id) + '">'
+        +   '<table class="ibank-table"><thead><tr><th style="width:80px">Код</th><th>Вид діяльності</th></tr></thead><tbody>' + rows + '</tbody></table>'
+        + '</div>'
+        + '</div>';
+    });
+    wrap.innerHTML = html;
+    countEl.innerHTML = 'Основних КВЕДів: <b>' + totalMain + '</b> &nbsp;·&nbsp; Всього: <b>' + totalAll + '</b>';
+  }
+
+  function applyFilter() {
+    var q = searchEl.value.trim().toLowerCase();
+    var mainOnly = mainOnlyEl.checked;
+
+    var filtered = groups.map(function(g) {
+      var kveds = g.kveds.filter(function(k) {
+        if (mainOnly && !k.m) return false;
+        if (!q) return true;
+        return g.co.toLowerCase().indexOf(q) >= 0
+          || g.edr.toLowerCase().indexOf(q) >= 0
+          || k.c.toLowerCase().indexOf(q) >= 0
+          || k.d.toLowerCase().indexOf(q) >= 0;
+      });
+      return kveds.length ? { id: g.id, co: g.co, edr: g.edr, kveds: kveds } : null;
+    }).filter(Boolean);
+
+    buildAccordion(filtered);
+
+    // При пошуку розкриваємо всі
+    if (q || mainOnly) {
+      filtered.forEach(function(g) {
+        var body = document.getElementById('kved-body-' + g.id);
+        var head = document.querySelector('#kved-' + g.id + ' .ibank-head');
+        var arrow = document.getElementById('kved-arrow-' + g.id);
+        if (body) body.classList.add('open');
+        if (head) head.classList.add('open');
+        if (arrow) arrow.classList.add('up');
+      });
+    }
+  }
+
+  applyFilter();
+  searchEl.addEventListener('input', applyFilter);
+  mainOnlyEl.addEventListener('change', applyFilter);
+}
+
+function kvedToggle(id) {
+  var body = document.getElementById('kved-body-' + id);
+  var head = document.querySelector('#kved-' + id + ' .ibank-head');
+  var arrow = document.getElementById('kved-arrow-' + id);
+  if (!body) return;
+  var isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  if (head) head.classList.toggle('open', !isOpen);
+  if (arrow) arrow.classList.toggle('up', !isOpen);
+}
+
+
+/* ══════════════════════════════════════
+   БІБЛІОТЕКА ДОКУМЕНТІВ
+══════════════════════════════════════ */
+var LIB_DATA = [
+  { name: "АМБЕР ТЕХНОЛОДЖІ", edr: "45701803", color: "#1D9E75",
+    folders: [
+      { name: "Договори АМБЕР", url: "https://1drv.ms/f/c/0422097903eac997/IgD7URiVuft8Q5KGeDPRwa6AAXjymxsdDHYUw9RCOtYFAlQ?e=LFr5SM" },
+      { name: "Листування АМБЕР", url: "https://1drv.ms/f/c/0422097903eac997/IgCE9bmb5G-TT5tcDBGfRif3AecAwUmbeXnauw8olC93nfo?e=meUinS" },
+      { name: "Накази АМБЕР", url: "https://1drv.ms/f/c/0422097903eac997/IgANPNn6xrPuSaij6LjdJ7ycAb_YrwIeTloNBaJ1vopdRc0?e=3oYALb" },
+      { name: "Проєкт КОНЬЯК", url: "https://1drv.ms/f/c/0422097903eac997/IgAWZFtvXf_kTYRJWp6ACxzZAWAkTnW1QMdvgePkxojX_ZQ?e=f5huBo" },
+      { name: "Фінансова звітність АМБЕР", url: "https://1drv.ms/f/c/0422097903eac997/IgC74Lwh0g9kQYApNvOWMEEJARWy-oFNkZLCvmseQvWRjxM?e=2cRb6b" },
+      { name: "Юридичні документи АМБЕР", url: "https://1drv.ms/f/c/0422097903eac997/IgDPqnXrwl6ISoRBMGHMJnCtAQ1O1QuWzkUlFTwLoBHRhdk?e=maIXE6" }
+    ]
+  },
+  { name: "ДЖАРВИС", edr: "46370383", color: "#8F7EE7",
+    folders: [
+      { name: "Договори ДЖАРВИС", url: "https://1drv.ms/f/c/0422097903eac997/IgDOhP6Uct7dRqDldnyul7bOAQegLnf6TDJ2kclNjfLF0CY?e=AMqjJx" },
+      { name: "Листування ДЖАРВИС", url: "https://1drv.ms/f/c/0422097903eac997/IgDQ-Et2bf-IQa9y1zQOswBaAU1Jl7zaAFX0TultsyCAa9I?e=lXRJZe" },
+      { name: "Накази ДЖАРВИС", url: "https://1drv.ms/f/c/0422097903eac997/IgCeOYE4lQxsRIEpjS6bLOPnAVcfakRA-zzFKwiTAfSFnDA?e=vbiYKE" },
+      { name: "Фінансова звітність ДЖАРВИС", url: "https://1drv.ms/f/c/0422097903eac997/IgCmjuPkFiGBQ5iMaQ3fjd6nAZjyYbpU8SfMvmlsN0KdmpQ?e=3Tt78f" },
+      { name: "Юридичні документи ДЖАРВИС", url: "https://1drv.ms/f/c/0422097903eac997/IgB-5gkpAlygSaS8Antoy81yAYmRcStXEaEOBipd6la_Qmk?e=L5S3wj" }
+    ]
+  },
+  { name: "ДОБРОБУТ ТА ЗАХИСТ (СБ)", edr: "43713670", color: "#D4537E",
+    folders: [
+      { name: "Агентські договори", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEYwcAAAAAAXExyXeOBT1UP7W6j3vs8U4?e=h19Rmd" },
+      { name: "Договір оренди приміщення", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEYgcAAAAAASybwswbuuk-UbDUaG_7iv4?e=bLVj9S" },
+      { name: "Договори переуступки", url: "https://1drv.ms/f/c/0422097903eac997/IgDva8g178z2QIqT9aSXsjNnAQyzZ71xA-Is4lpPSExVNIY?e=H6mOUr" },
+      { name: "Договори СБ", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEzZcAAAAAAdfnIbXhK_39p0mwHQoaK3E?e=drj5SX" },
+      { name: "Договори фінансової допомоги", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEtQ0AAAAAAdFKVYcu-5wYpywmrql938g?e=uBn4jg" },
+      { name: "Листування СБ ДтаЗ", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEzJcAAAAAAVkyTe3n5myfEkO8oVgaKqs?e=Irhph8" },
+      { name: "Накази СБ ДтаЗ", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAElKAAAAAAAcFrFIrM5ur3RsHjG4XxxTM?e=3UbZyX" },
+      { name: "НБУ", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAE4pwAAAAAATzYZ360DqFd9k1kl7KBlkk?e=0gLCVl" },
+      { name: "Фінансова звітність СБ", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEh44AAAAAAUjBJU6Hi-k9vF2hE4O-VtU?e=pfl2RL" },
+      { name: "Юридичні документи СБ ДтаЗ", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEtp4AAAAAATXng8TuaUL6-5XSkJSKa54?e=TrrSFH" }
+    ]
+  },
+  { name: "ДС7", edr: "45498127", color: "#378ADD",
+    folders: [
+      { name: "Договори ДС7", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAE1M4AAAAAAUpqvTzBBijaFFfwcLp7vyA?e=2fkZHb" },
+      { name: "Листування ДС7", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAE3c4AAAAAAbMbtDgrVXMmcJhr7Zrpkzk?e=nxnYV9" },
+      { name: "Накази ДС7", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAE3s4AAAAAAYDPAHYgynmFx1RTHjUtRLI?e=edU5CU" },
+      { name: "Фінансова звітність", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEaOsAAAAAAWrLazj1OZFMsgoThYtPeXQ?e=Tgamzv" },
+      { name: "Юридичні документи", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAENMsAAAAAAewJ2ML_WMY_cnL92BmjXTo?e=jpvEjr" }
+    ]
+  },
+  { name: "М21", edr: "40991786", color: "#BA7517",
+    folders: [
+      { name: "Господарські договори М21", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEkKAAAAAAAZmYVjO1R-7Vq7-IdfTqpeY?e=kSnlBq" },
+      { name: "Договора оренди М21", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEv7YAAAAAAYpGHfrHwIDT1rVrCg_sqQo?e=mtmfCv" },
+      { name: "Листування М21", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEKQcAAAAAAb100Ju3UBME2AnTCf40Z3M?e=3izt3b" },
+      { name: "Накази кадрові М21", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEkqAAAAAAAfOglPS9V6XZka-gj7eNtRQ?e=jQZNKP" },
+      { name: "Фінансова звітність", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAE5IcBAAAAAeED--J0OUCdEPoimNDnUOY?e=8X9l1f" },
+      { name: "Юридичні документи М21", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEIQcAAAAAAUWtfQ4GjKtF04486XImpdA?e=WTKdeT" }
+    ]
+  },
+  { name: "М41", edr: "45702739", color: "#BA7517",
+    folders: [
+      { name: "Договори М41", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEsusAAAAAASIO3mtY8Y4Lw99aC2fqLLw?e=lSmZJL" },
+      { name: "Листування М41", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEsesAAAAAAYOZWYAQmWEFV_e6Zs3S-gk?e=lTjK52" },
+      { name: "Накази", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAExesAAAAAAQnJMAR8SrEh8GDCwDRrvbo?e=qjaIC6" },
+      { name: "Фінансова звітність М41", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEs-sAAAAAAcZkSPdht9NlVSBZLuZ-BGU?e=LOhTVt" },
+      { name: "Юридичні документи М41", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEtOsAAAAAAfUicemIT3BTv9AUVuK32WM?e=5oABBS" }
+    ]
+  },
+  { name: "ПРОФПОСЕРЕДНИК", edr: "45722194", color: "#1D9E75",
+    folders: [
+      { name: "Договори ПРОФПОСЕРЕДНИК", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAE2esAAAAAAVvWIUMKilrn0cZ-E3KMrDc?e=eEqENJ" },
+      { name: "Договори переуступки ПРОФПОСЕРЕДНИК", url: "https://1drv.ms/f/c/0422097903eac997/IgAt3NMTHbIqTrH9urmcHWyJAcjjHAX3jAnhnGLMAKsePpo?e=IqG0vq" },
+      { name: "Листування ПРОФПОСЕРЕДНИК", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAE2OsAAAAAASCPYEN6hNHtE41mQHdqhUw?e=911QnU" },
+      { name: "Накази ПРОФПОСЕРЕДНИК", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAE2-sAAAAAAa_Ii-ZLYfsJNe3eC0MiU-c?e=5rgeZP" },
+      { name: "Фінансова звітність ПРОФПОСЕРЕДНИК", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAE2usAAAAAAT8FJyCKoRU16OX-HbVSfDU?e=FJvVOq" },
+      { name: "Юридичні документи ПРОФПОСЕРЕДНИК", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAE1-sAAAAAAaslKzsiW_nSFhZE2R5l-BY?e=3vI1mu" }
+    ]
+  },
+  { name: "ROMASSET HOLDINGS S.R.L.", edr: "CUI 52240197", color: "#8F7EE7",
+    folders: [
+      { name: "Юридичні документи", url: "https://1drv.ms/f/c/0422097903eac997/IgD9UyWrADiuQIEwOcMWzWvlAfms9dfBl_vut4WiVQRDqkU?e=pNLm8i" }
+    ]
+  },
+  { name: "СКАЙІНС", edr: "46146734", color: "#BA7517",
+    folders: [
+      { name: "Договори СКАЙІНС", url: "https://1drv.ms/f/c/0422097903eac997/IgASs_mzSJfVRoUHwqF272MqAQGWvrNhd2toL6s8DYzhvMo?e=Mgidfb" },
+      { name: "Листування СКАЙІНС", url: "https://1drv.ms/f/c/0422097903eac997/IgAi2ApPvYD3RoDZvwttc6MGARBVoKlzefW8gNkDPmRnHCM?e=U6lVI2" },
+      { name: "Накази СКАЙІНС", url: "https://1drv.ms/f/c/0422097903eac997/IgAvpdDfEHMCT7QLcfhz2x0DAYrEtIbjMbVzXMghym87zAc?e=M1nuCU" },
+      { name: "Протоколи СКАЙІНС", url: "https://1drv.ms/f/c/0422097903eac997/IgDz0HOgOTn1R45HfH9AmWkZAfIL-ECydS_cUV5TkYn5DO4?e=jAU50G" },
+      { name: "Фінансова звітність СКАЙІНС", url: "https://1drv.ms/f/c/0422097903eac997/IgBCCqPxHSD6QIrqDrzgXLRjAQxbdOzf9b1AIYWcLSP8twg?e=sSibvw" },
+      { name: "Юридичні документи СКАЙІНС", url: "https://1drv.ms/f/c/0422097903eac997/IgAmXkKSFyiJR7ku7HYbMjIUATvy4cE5Z1-TJUoTyx0R18Q?e=Wpduty" }
+    ]
+  },
+  { name: "СмартКонсалт", edr: "46092134", color: "#D4537E",
+    folders: [
+      { name: "Договори СМАРТКОНСАЛТ", url: "https://1drv.ms/f/c/0422097903eac997/IgAFqgbdpQGLRqlB7lfAhVLCAXapTut0Wo0buswaWaGl6CI?e=w46kB7" },
+      { name: "Договори переуступки СМАРТКОНСАЛТ", url: "https://1drv.ms/f/c/0422097903eac997/IgBfy_36PrDURLv088fTUPrjAWKCV8LpmSR98BwVW1C_LSQ?e=LmXnaM" },
+      { name: "Листування СМАРТКОНСАЛТ", url: "https://1drv.ms/f/c/0422097903eac997/IgDk-wXw-1BbSosotHB-CwqVAR7SyuCVP3-XU3HEffFHQvU?e=ooJHSO" },
+      { name: "Накази СМАРТКОНСАЛТ", url: "https://1drv.ms/f/c/0422097903eac997/IgD7U_-Ktm0bTZL2GohS0JElAQb4UIuH90dwz3curkIuLvQ?e=mr6XWE" },
+      { name: "Фінансова звітність СМАРТКОНСАЛТ", url: "https://1drv.ms/f/c/0422097903eac997/IgACWZJwJgW0QL252Fq4mdO4AQiyzxrUdtBeR1s5vvPdkB8?e=VPaeHt" },
+      { name: "Юридичні документи СМАРТКОНСАЛТ", url: "https://1drv.ms/f/c/0422097903eac997/IgB9rkXma_zhSYQANeXFOf1yAU8Iq0RhVVEttQDw3ADK14I?e=ZuMtXE" }
+    ]
+  },
+  { name: "ФІТ", edr: "44434476", color: "#1D9E75",
+    folders: [
+      { name: "Договори ФІТ", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEsZcAAAAAAd7JRvVpkxOOGE5PQKHgoKg?e=KTHhwA" },
+      { name: "Листування ФІТ", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEj5MAAAAAAZJEuARpBcBmOrHfNY3IFdU?e=1XO6Nu" },
+      { name: "Накази ФІТ", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEpKAAAAAAAU7-Pc8U8HNkk-mmCkZ86Pk?e=nd2eoM" },
+      { name: "Фінансова звітність ФІТ", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEVqwAAAAAAeJGU-YZAKVaG53nTSZmEko?e=OmfUxZ" },
+      { name: "Юридичні документи ФІТ", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAE1JEAAAAAAUgdGw9l39N1ZotC235AkAM?e=b1z2Cb" }
+    ]
+  },
+  { name: "ФОКУСІТ", edr: "45900452", color: "#378ADD",
+    folders: [
+      { name: "Договори ФОКУСІТ", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEhuIAAAAAAWIvHeaQwwqZYTtQwrTxUq0?e=VoUvWm" },
+      { name: "Листування ФОКУСІТ", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEg-IAAAAAARwkA1933MZLkrLMONakX7w?e=06FTrV" },
+      { name: "Накази ФОКУСІТ", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEeOIAAAAAAaTLO0FAmYMnwGYUNIWN2WA?e=WPAx2H" },
+      { name: "Фінансова звітність ФОКУСІТ", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAElusAAAAAAVQj1UT-rItwxqpF8Z3b3RU?e=sHbrnd" },
+      { name: "Юридичні документи ФОКУСІТ", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEFOIAAAAAAXYhWbLhOFWjNS2oSMDrUAk?e=QIq0ZG" }
+    ]
+  },
+  { name: "ЦОП", edr: "45747009", color: "#888780",
+    folders: [
+      { name: "Договори ЦОП", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEx-sAAAAAAav-M2SVcBhmboyxw5Bw2_c?e=AIFeEC" },
+      { name: "Листування ЦОП", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEyOsAAAAAAe5vJ5AaRykUNOXN_zdKYrg?e=xnuMEe" },
+      { name: "Накази ЦОП", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEzusAAAAAAey6yZ7BSiphxQCXKte7yF8?e=4WZliV" },
+      { name: "Фінансова звітність ЦОП", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEyusAAAAAAS3U0EmVp-qK9gsbJm5jg7E?e=IShMb6" },
+      { name: "Юридичні документи ЦОП", url: "https://1drv.ms/f/c/0422097903eac997/IgCXyeoDeQkiIIAEyesAAAAAAYfyoEnMO7JUmUNZFctiYrE?e=0dC3l2" }
+    ]
+  }
+];
+
+(function renderLib() {
+  var grid = document.getElementById('lib-grid');
+  if (!grid) return;
+  LIB_DATA.forEach(function(co) {
+    var linked = co.folders.filter(function(f){ return f.url; }).length;
+    var total = co.folders.length;
+    var foldersHtml = co.folders.map(function(f) {
+      if (f.url) {
+        return '<a class="lib-folder" href="' + f.url + '" target="_blank" rel="noopener">' +
+          '<span class="lib-folder-icon">📂</span>' +
+          '<span class="lib-folder-name">' + f.name + '</span>' +
+          '<span style="font-size:11px;color:#8a95a8">↗</span></a>';
+      } else {
+        return '<span class="lib-folder no-link">' +
+          '<span class="lib-folder-icon">📁</span>' +
+          '<span class="lib-folder-name">' + f.name + '</span></span>';
+      }
+    }).join('');
+    var card = document.createElement('div');
+    card.className = 'lib-card';
+    card.innerHTML =
+      '<div class="lib-card-head">' +
+        '<div class="lib-dot" style="background:' + co.color + '"></div>' +
+        '<div class="lib-card-name">' + co.name + '</div>' +
+        '<div class="lib-card-edr">' + co.edr + '</div>' +
+      '</div>' +
+      '<div class="lib-folders">' + foldersHtml + '</div>' +
+      '';
+    grid.appendChild(card);
+  });
+})();
+
+
+
+/* ══ ЖУРНАЛИ — ЛОГІКА ══ */
+var JRN_COMPANIES = ["АМБЕР ТЕХНОЛОДЖІ","БІЗСЕРВІСНЕО","ДЖАРВИС","ДОБРОБУТ ТА ЗАХИСТ","ДС7","М21","М41","ПРОФПОСЕРЕДНИК","СКАЙІНС","СмартКонсалт","ФІТ","ФОКУСІТ","ЦОП","ROMASSET HOLDINGS"];
+
+var JRN_JOURNALS = {
+  in: {
+    label: "Вхідна пошта",
+    storageKey: "jrn_in",
+    statuses: ["Отримано","Опрацьовано","Перенаправлено","Архів"],
+    cols: [
+      {key:"num",    label:"№",          w:"70px"},
+      {key:"date",   label:"Дата",       w:"100px"},
+      {key:"co",     label:"Компанія",   w:"160px"},
+      {key:"sender", label:"Від кого",   w:"180px"},
+      {key:"ref",    label:"Вих. № відправника", w:"130px"},
+      {key:"subj",   label:"Тема / опис", w:"auto"},
+      {key:"status", label:"Статус",     w:"110px"},
+      {key:"exec",   label:"Виконавець", w:"130px"},
+      {key:"link", label:"", w:"0px", hide:true}
+    ],
+    fields: [
+      {key:"num",    label:"Реєстраційний № *",  type:"text",  placeholder:"ВХ-2026-001", half:true},
+      {key:"date",   label:"Дата отримання *",   type:"date",  half:true},
+      {key:"co",     label:"Компанія",            type:"select-co", half:false},
+      {key:"sender", label:"Від кого",            type:"text",  placeholder:"ТОВ «Назва» / Прізвище І.О."},
+      {key:"ref",    label:"Вих. № відправника", type:"text",  placeholder:"№ листа відправника", half:true},
+      {key:"ref_date",label:"Дата листа відправника",type:"date", half:true},
+      {key:"subj",   label:"Тема / опис",         type:"textarea"},
+      {key:"status", label:"Статус",              type:"select-status", half:true},
+      {key:"exec",   label:"Виконавець",          type:"text",  placeholder:"Прізвище І.О.", half:true},
+      {key:"deadline",label:"Термін відповіді",   type:"date",  half:true},
+      {key:"note",   label:"Примітки",            type:"textarea"},
+      {key:"link",   label:"Посилання на файл OneDrive", type:"url", placeholder:"https://1drv.ms/..."}
+    ]
+  },
+  out: {
+    label: "Вихідна пошта",
+    storageKey: "jrn_out",
+    statuses: ["Підготовлено","Підписано","Відправлено","Архів"],
+    cols: [
+      {key:"num",    label:"№",          w:"70px"},
+      {key:"date",   label:"Дата",       w:"100px"},
+      {key:"co",     label:"Компанія",   w:"160px"},
+      {key:"recip",  label:"Кому",       w:"180px"},
+      {key:"subj",   label:"Тема / опис", w:"auto"},
+      {key:"signer", label:"Підписант",  w:"130px"},
+      {key:"status", label:"Статус",     w:"110px"},
+      {key:"link", label:"", w:"0px", hide:true}
+    ],
+    fields: [
+      {key:"num",    label:"Реєстраційний № *",  type:"text",  placeholder:"ВИХ-2026-001", half:true},
+      {key:"date",   label:"Дата підписання *",  type:"date",  half:true},
+      {key:"co",     label:"Компанія",            type:"select-co"},
+      {key:"recip",  label:"Кому",               type:"text",  placeholder:"ТОВ «Назва» / Орган"},
+      {key:"subj",   label:"Тема / опис",         type:"textarea"},
+      {key:"signer", label:"Підписант",           type:"text",  placeholder:"Прізвище І.О.", half:true},
+      {key:"status", label:"Статус",             type:"select-status", half:true},
+      {key:"note",   label:"Примітки",            type:"textarea"},
+      {key:"link",   label:"Посилання на файл OneDrive", type:"url", placeholder:"https://1drv.ms/..."}
+    ]
+  },
+  contr: {
+    label: "Договори",
+    storageKey: "jrn_contr",
+    statuses: ["Проєкт","Погоджено","Підписано","Діє","Закінчено","Розірвано"],
+    cols: [
+      {key:"num",    label:"№",          w:"70px"},
+      {key:"date",   label:"Дата",       w:"100px"},
+      {key:"co",     label:"Компанія",   w:"160px"},
+      {key:"counterpart",label:"Контрагент", w:"180px"},
+      {key:"subj",   label:"Предмет",    w:"auto"},
+      {key:"amount", label:"Сума",       w:"110px"},
+      {key:"expire", label:"Дія до",     w:"95px"},
+      {key:"status", label:"Статус",     w:"100px"},
+      {key:"link", label:"", w:"0px", hide:true}
+    ],
+    fields: [
+      {key:"num",        label:"Реєстраційний № *", type:"text",  placeholder:"ДГ-2026-001", half:true},
+      {key:"date",       label:"Дата підписання *", type:"date",  half:true},
+      {key:"co",         label:"Компанія",           type:"select-co"},
+      {key:"counterpart",label:"Контрагент",         type:"text",  placeholder:"ТОВ «Назва», ЄДРПОУ"},
+      {key:"subj",       label:"Предмет договору",   type:"textarea"},
+      {key:"amount",     label:"Сума (грн)",         type:"text",  placeholder:"100 000,00", half:true},
+      {key:"currency",   label:"Валюта",             type:"text",  placeholder:"UAH", half:true},
+      {key:"start",      label:"Дата початку",       type:"date",  half:true},
+      {key:"expire",     label:"Дата закінчення",    type:"date",  half:true},
+      {key:"status",     label:"Статус",             type:"select-status", half:true},
+      {key:"exec",       label:"Відповідальний",     type:"text",  placeholder:"Прізвище І.О.", half:true},
+      {key:"note",       label:"Примітки",           type:"textarea"},
+      {key:"link",       label:"Посилання на файл OneDrive", type:"url", placeholder:"https://1drv.ms/..."}
+    ]
+  },
+  proto: {
+    label: "Протоколи",
+    storageKey: "jrn_proto",
+    statuses: ["Проєкт","Підписано","Зареєстровано","Архів"],
+    cols: [
+      {key:"num",    label:"№",          w:"70px"},
+      {key:"date",   label:"Дата",       w:"100px"},
+      {key:"co",     label:"Компанія",   w:"160px"},
+      {key:"ptype",  label:"Тип",        w:"120px"},
+      {key:"subj",   label:"Питання / опис", w:"auto"},
+      {key:"status", label:"Статус",     w:"100px"},
+      {key:"link", label:"", w:"0px", hide:true}
+    ],
+    fields: [
+      {key:"num",    label:"Реєстраційний № *", type:"text",  placeholder:"ПРТ-2026-001", half:true},
+      {key:"date",   label:"Дата засідання *",  type:"date",  half:true},
+      {key:"co",     label:"Компанія",           type:"select-co"},
+      {key:"ptype",  label:"Тип протоколу",      type:"select", options:["Загальні збори учасників","Засідання директора","Наглядова рада","Інше"], half:true},
+      {key:"num_q",  label:"К-сть питань",       type:"text",  placeholder:"3", half:true},
+      {key:"subj",   label:"Питання на порядку денному", type:"textarea"},
+      {key:"status", label:"Статус",             type:"select-status", half:true},
+      {key:"exec",   label:"Секретар",           type:"text",  placeholder:"Прізвище І.О.", half:true},
+      {key:"note",   label:"Примітки",           type:"textarea"},
+      {key:"link",   label:"Посилання на файл OneDrive", type:"url", placeholder:"https://1drv.ms/..."}
+    ]
+  }
+};
+
+var jrn_state = {
+  journal: "in",
+  co: "",
+  search: "",
+  year: "2026",
+  status: "",
+  dateFrom: "",
+  dateTo: "",
+  page: 1,
+  perPage: 25,
+  sortKey: "date",
+  sortDir: -1,
+  editId: null
+};
+
+var jrn_cache = {};
+
+function jrn_storageKey() { return "jrn_" + jrn_state.journal; }
+
+function jrn_setSyncStatus(msg, color) {
+  var el = document.getElementById("jrn-sync");
+  if (el) { el.textContent = msg; el.style.color = color || "#8a95a8"; }
+}
+
+async function jrn_netlifyGet(key) {
+  try {
+    var r = await fetch('/.netlify/functions/journal-storage?key=' + encodeURIComponent(key));
+    if (r.ok) {
+      var d = await r.json();
+      return JSON.parse(d.value || '[]');
+    }
+  } catch(e) {}
+  try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) { return []; }
+}
+
+async function jrn_netlifySet(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {}
+  try {
+    var r = await fetch('/.netlify/functions/journal-storage?key=' + encodeURIComponent(key), {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({value: JSON.stringify(val)})
+    });
+    return r.ok;
+  } catch(e) { return false; }
+}
+
+function jrn_getRecords() {
+  return jrn_cache[jrn_state.journal] || [];
+}
+
+async function jrn_loadRecords() {
+  jrn_setSyncStatus("↻ завантаження...", "#d4a843");
+  var data = await jrn_netlifyGet(jrn_storageKey());
+  jrn_cache[jrn_state.journal] = data;
+  var now = new Date();
+  var ts = now.toLocaleDateString("uk-UA") + " " + now.toLocaleTimeString("uk-UA", {hour:"2-digit",minute:"2-digit"});
+  jrn_setSyncStatus("✓ синхр. " + ts, "#4ade80");
+  return data;
+}
+
+async function jrn_saveRecords(arr) {
+  jrn_cache[jrn_state.journal] = arr;
+  jrn_setSyncStatus("↻ збереження...", "#d4a843");
+  var ok = await jrn_netlifySet(jrn_storageKey(), arr);
+  var now2 = new Date();
+  var ts2 = now2.toLocaleDateString("uk-UA") + " " + now2.toLocaleTimeString("uk-UA", {hour:"2-digit",minute:"2-digit"});
+  jrn_setSyncStatus(ok ? "✓ збережено " + ts2 : "⚠ помилка збереження", ok ? "#4ade80" : "#f87171");
+}
+
+async function jrn_setJournal(j, btn) {
+  jrn_state.journal = j;
+  jrn_state.page = 1;
+  jrn_state.status = "";
+  ["in","out","contr","proto"].forEach(function(k){
+    var el=document.getElementById("jrn-btn-"+k);
+    if(el){el.style.color="#1a1d23";el.style.borderBottomColor="transparent";}
+  });
+  if(btn){btn.style.color="#1e4fa0";btn.style.borderBottomColor="#1e4fa0";}
+  document.getElementById("jrn-q-status").value = "";
+  jrn_renderStatusOptions();
+  if (!jrn_cache[j]) await jrn_loadRecords();
+  jrn_render();
+}
+
+function jrn_filterCo(co, el) {
+  jrn_state.co = co;
+  jrn_state.page = 1;
+  document.querySelectorAll(".sidebar-link").forEach(function(a){ a.classList.remove("active"); });
+  el.classList.add("active");
+  jrn_render();
+}
+
+function jrn_applyFilters() {
+  jrn_state.search = document.getElementById("jrn-q-search").value.trim().toLowerCase();
+  jrn_state.year = document.getElementById("jrn-q-year").value;
+  jrn_state.status = document.getElementById("jrn-q-status").value;
+  jrn_state.dateFrom = document.getElementById("jrn-q-dfrom").value;
+  jrn_state.dateTo = document.getElementById("jrn-q-dto").value;
+  var coEl = document.getElementById("jrn-q-co");
+  if (coEl) jrn_state.co = coEl.value;
+  jrn_state.page = 1;
+  jrn_render();
+}
+
+function clearFilters() {
+  jrn_state.search = ""; jrn_state.year = "2026"; jrn_state.status = ""; jrn_state.dateFrom = ""; jrn_state.dateTo = "";
+  document.getElementById("jrn-q-search").value = "";
+  document.getElementById("jrn-q-year").value = "2026";
+  document.getElementById("jrn-q-status").value = "";
+  document.getElementById("jrn-q-dfrom").value = "";
+  document.getElementById("jrn-q-dto").value = "";
+  jrn_state.page = 1;
+  jrn_render();
+}
+
+function jrn_renderStatusOptions() {
+  var sel = document.getElementById("jrn-q-status");
+  var jrn = JRN_JOURNALS[jrn_state.journal];
+  sel.innerHTML = '<option value="">Всі статуси</option>';
+  jrn.statuses.forEach(function(s){
+    var opt = document.createElement("option");
+    opt.value = s; opt.textContent = s;
+    sel.appendChild(opt);
+  });
+}
+
+function jrn_filteredRecords() {
+  var all = jrn_getRecords();
+  return all.filter(function(r) {
+    if (jrn_state.co && r.co !== jrn_state.co) return false;
+    if (jrn_state.year && r.date && r.date.indexOf(jrn_state.year) !== 0) return false;
+    if (jrn_state.status && r.status !== jrn_state.status) return false;
+    if (jrn_state.dateFrom && r.date && r.date < jrn_state.dateFrom) return false;
+    if (jrn_state.dateTo && r.date && r.date > jrn_state.dateTo) return false;
+    if (jrn_state.search) {
+      var hay = (r.num||"")+" "+(r.co||"")+" "+(r.subj||"")+" "+(r.sender||"")+" "+(r.recip||"")+" "+(r.counterpart||"")+" "+(r.note||"");
+      if (hay.toLowerCase().indexOf(jrn_state.search) < 0) return false;
+    }
+    return true;
+  });
+}
+
+function jrn_sorted(arr) {
+  var k = jrn_state.sortKey, d = jrn_state.sortDir;
+  return arr.slice().sort(function(a,b){
+    var av = a[k]||"", bv = b[k]||"";
+    return av < bv ? -d : av > bv ? d : 0;
+  });
+}
+
+function jrnH(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function jrn_statusBadge(s, jKey) {
+  var cls = "status-pending";
+  if (!s) return "";
+  var t = s.toLowerCase();
+  if (t==="підписано"||t==="відправлено"||t==="опрацьовано"||t==="діє"||t==="отримано") cls="status-active";
+  else if (t==="архів"||t==="закінчено"||t==="розірвано") cls="status-closed";
+  return '<span class="status '+cls+'">'+jrnH(s)+'</span>';
+}
+
+function jrn_cellVal(r, key) {
+  switch(key) {
+    case "num":     return r.link ? '<span class="num-cell num-link" data-url="'+jrnH(r.link)+'" title="Відкрити на OneDrive ↗">'+jrnH(r.num||"—")+'</span>' : '<span class="num-cell">'+jrnH(r.num||"—")+'</span>';
+    case "date":    return '<span class="date-cell">'+jrnH((r.date||"").split("-").reverse().join("."))+'</span>';
+    case "expire":  return r.expire ? '<span class="date-cell">'+jrnH(r.expire.split("-").reverse().join("."))+'</span>' : '<span class="no-link">—</span>';
+    case "co":      return '<span class="co-badge">'+jrnH(r.co)+'</span>';
+    case "status":  return jrn_statusBadge(r.status);
+    case "amount":  return r.amount ? '<span style="font-family:monospace;font-size:11px">'+jrnH(r.amount)+(r.currency?" "+jrnH(r.currency):"")+'</span>' : '<span class="no-link">—</span>';
+    case "link":    return r.link ? '<a href="'+jrnH(r.link)+'" target="_blank" rel="noopener" style="display:inline-block;background:#1a2744;color:#d4a843;font-family:monospace;font-size:11px;font-weight:700;padding:3px 10px;border-radius:3px;text-decoration:none;white-space:nowrap">↗ OneDrive</a>' : '<span style="font-family:monospace;font-size:10px;color:#c4cad6">немає</span>';
+    case "actions": return '<span class="actions-cell"><button class="btn btn-export btn-sm" onclick="openModal(\''+r.id+'\')">Ред.</button></span>';
+    default:        return '<span style="font-size:12px">'+jrnH(r[key]||"—")+'</span>';
+  }
+}
+
+function jrn_render() {
+  jrn_renderStats();
+  jrn_renderTable();
+}
+
+function jrn_renderStats() {
+  var all = jrn_getRecords();
+  var flt = jrn_filteredRecords();
+  var jrn = JRN_JOURNALS[jrn_state.journal];
+  var signed = all.filter(function(r){ return r.status === "Підписано" || r.status === "Діє"; }).length;
+  var pending = all.filter(function(r){ var t=(r.status||"").toLowerCase(); return t==="проєкт"||t==="підготовлено"||t==="погоджено"||t==="отримано"; }).length;
+  var html =
+    '<div class="stat-card"><div class="stat-value">'+flt.length+'</div><div class="stat-label">відображається (фільтр)</div></div>'+
+    '<div class="stat-card"><div class="stat-value">'+all.length+'</div><div class="stat-label">всього записів у журналі</div></div>'+
+    '<div class="stat-card"><div class="stat-value">'+signed+'</div><div class="stat-label">підписано / діє</div></div>'+
+    '<div class="stat-card"><div class="stat-value">'+pending+'</div><div class="stat-label">в роботі / проєкт</div></div>';
+  document.getElementById("jrn-stats-row").innerHTML = html;
+}
+
+function jrn_renderTable() {
+  var jrn = JRN_JOURNALS[jrn_state.journal];
+  var cols = jrn.cols;
+  var data = jrn_sorted(jrn_filteredRecords());
+  var total = data.length;
+  var pages = Math.max(1, Math.ceil(total / jrn_state.perPage));
+  if (jrn_state.page > pages) jrn_state.page = pages;
+  var slice = data.slice((jrn_state.page-1)*jrn_state.perPage, jrn_state.page*jrn_state.perPage);
+
+  var thead = "<tr>";
+  cols.forEach(function(c){
+    if (c.key==="actions") { thead += '<th style="width:'+c.w+'"></th>'; return; }
+    var sorted_cls = jrn_state.sortKey===c.key ? " sorted" : "";
+    var arrow = jrn_state.sortKey===c.key ? (jrn_state.sortDir===1?" ▲":" ▼") : "";
+    thead += '<th style="width:'+c.w+'" class="'+sorted_cls+'" onclick="sortBy(\''+c.key+'\')">'+jrnH(c.label)+arrow+'</th>';
+  });
+  thead += "</tr>";
+  document.getElementById("jrn-thead").innerHTML = thead;
+
+  if (!slice.length) {
+    document.getElementById("jrn-tbody").innerHTML = "";
+    document.getElementById("jrn-empty").classList.remove("hidden");
+  } else {
+    document.getElementById("jrn-empty").classList.add("hidden");
+    var rows = "";
+    slice.forEach(function(r){
+      rows += '<tr class="jrn-row" data-id="'+r.id+'" style="cursor:pointer" title="Клік для редагування">';
+      cols.forEach(function(c){
+        if (c.hide) return;
+        if (c.key==="actions") return;
+        rows += "<td>"+jrn_cellVal(r,c.key)+"</td>";
+      });
+      rows += "</tr>";
+    });
+    document.getElementById("jrn-tbody").innerHTML = rows;
+  }
+
+  var phtml = "";
+  phtml += '<button class="pg-btn" onclick="goPage('+(jrn_state.page-1)+')" '+(jrn_state.page<=1?"disabled":"")+'>&larr;</button>';
+  phtml += '<span class="pg-info">Сторінка '+jrn_state.page+' з '+pages+' &nbsp;·&nbsp; Записів: '+total+'</span>';
+  phtml += '<button class="pg-btn" onclick="goPage('+(jrn_state.page+1)+')" '+(jrn_state.page>=pages?"disabled":"")+'>&rarr;</button>';
+  document.getElementById("jrn-pg").innerHTML = phtml;
+}
+
+function jrn_goPage(p) { jrn_state.page = p; jrn_render(); }
+
+function jrn_sortBy(k) {
+  if (jrn_state.sortKey === k) jrn_state.sortDir *= -1;
+  else { jrn_state.sortKey = k; jrn_state.sortDir = -1; }
+  jrn_render();
+}
+
+function jrn_openModal(id) {
+  var jrn = JRN_JOURNALS[jrn_state.journal];
+  jrn_state.editId = id || null;
+  var rec = {};
+  if (id) {
+    var arr = jrn_getRecords();
+    for (var i=0;i<arr.length;i++) { if (arr[i].id===id) { rec=arr[i]; break; } }
+  }
+  document.getElementById("jrn-mtitle").textContent = id ? "Редагування запису" : "Новий запис — "+jrn.label;
+  document.getElementById("jrn-bdel").style.display = id ? "inline-block" : "none";
+
+  var form = "";
+  jrn.fields.forEach(function(f){
+    var full = !f.half ? " full" : "";
+    form += '<div class="form-group'+full+'">';
+    form += '<label class="form-label">'+jrnH(f.label)+'</label>';
+    var val = jrnH(rec[f.key]||"");
+    if (f.type==="textarea") {
+      form += '<textarea class="form-textarea" id="jrn-f_'+f.key+'" rows="3">'+val+'</textarea>';
+    } else if (f.type==="select-co") {
+      form += '<select class="form-select" id="jrn-f_'+f.key+'"><option value="">— обери компанію —</option>';
+      JRN_COMPANIES.forEach(function(c){ form += '<option value="'+jrnH(c)+'"'+(rec[f.key]===c?" selected":"")+'>'+jrnH(c)+'</option>'; });
+      form += '</select>';
+    } else if (f.type==="select-status") {
+      form += '<select class="form-select" id="jrn-f_'+f.key+'"><option value="">—</option>';
+      jrn.statuses.forEach(function(s){ form += '<option value="'+jrnH(s)+'"'+(rec[f.key]===s?" selected":"")+'>'+jrnH(s)+'</option>'; });
+      form += '</select>';
+    } else if (f.type==="select") {
+      form += '<select class="form-select" id="jrn-f_'+f.key+'"><option value="">—</option>';
+      (f.options||[]).forEach(function(s){ form += '<option value="'+jrnH(s)+'"'+(rec[f.key]===s?" selected":"")+'>'+jrnH(s)+'</option>'; });
+      form += '</select>';
+    } else {
+      form += '<input class="form-input" id="jrn-f_'+f.key+'" type="'+(f.type||"text")+'" placeholder="'+(f.placeholder||"")+'" value="'+val+'">';
+    }
+    form += '</div>';
+  });
+  document.getElementById("jrn-mform").innerHTML = form;
+  document.getElementById("jrn-moverlay").classList.remove("hidden");
+}
+
+function jrn_closeModal() {
+  document.getElementById("jrn-moverlay").classList.add("hidden");
+  jrn_state.editId = null;
+}
+
+async function jrn_saveRecord() {
+  var jrn = JRN_JOURNALS[jrn_state.journal];
+  var rec = {};
+  jrn.fields.forEach(function(f){
+    var el = document.getElementById("jrn-f_"+f.key);
+    if (el) rec[f.key] = el.value.trim();
+  });
+  if (!rec.num) { alert("Вкажіть реєстраційний номер"); return; }
+  if (!rec.date) { alert("Вкажіть дату реєстрації"); return; }
+  if (!rec.co) { alert("Оберіть компанію"); return; }
+  var arr = jrn_getRecords();
+  if (rec.num) {
+    var dup = arr.filter(function(r){ return r.num && r.num.trim() === rec.num.trim() && r.id !== jrn_state.editId; });
+    if (dup.length > 0) { alert("Номер «" + rec.num + "» вже існує в журналі «" + JRN_JOURNALS[jrn_state.journal].label + "». Введіть інший номер."); return; }
+  }
+  if (jrn_state.editId) {
+    for (var i=0;i<arr.length;i++) { if (arr[i].id===jrn_state.editId) { rec.id=jrn_state.editId; arr[i]=rec; break; } }
+  } else {
+    rec.id = Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+    rec.created = new Date().toISOString();
+    arr.push(rec);
+  }
+  await jrn_saveRecords(arr);
+  jrn_closeModal();
+  jrn_render();
+}
+
+async function jrn_deleteRecord() {
+  if (!jrn_state.editId) return;
+  if (!confirm("Видалити цей запис?")) return;
+  var arr = jrn_getRecords().filter(function(r){ return r.id !== jrn_state.editId; });
+  await jrn_saveRecords(arr);
+  jrn_closeModal();
+  jrn_render();
+}
+
+function jrn_exportCSV() {
+  var jrn = JRN_JOURNALS[jrn_state.journal];
+  var data = jrn_filteredRecords();
+  var cols = jrn.cols.filter(function(c){ return c.key!=="actions" && c.key!=="link"; });
+  cols.push({key:"link",label:"Посилання"});
+  var rows = [cols.map(function(c){ return '"'+c.label+'"'; }).join(",")];
+  data.forEach(function(r){
+    rows.push(cols.map(function(c){ return '"'+(r[c.key]||"").replace(/"/g,'""')+'"'; }).join(","));
+  });
+  var blob = new Blob(["\uFEFF"+rows.join("\n")], {type:"text/csv;charset=utf-8;"});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url; a.download = "journal_"+jrn_state.journal+"_"+new Date().toISOString().slice(0,10)+".csv";
+  a.click(); URL.revokeObjectURL(url);
+}
+
+document.addEventListener("keydown", function(e){ if(e.key==="Escape") jrn_closeModal(); });
+
+var jrnInitialized = false;
+async function jrn_initJournals() {
+  if (jrnInitialized) return;
+  jrnInitialized = true;
+  var tbl = document.getElementById('jrn-main-table');
+  if (tbl && !tbl._jrnBound) {
+    tbl._jrnBound = true;
+    tbl.addEventListener('click', function(e) {
+      var numEl = e.target.closest('.num-link');
+      if (numEl) { e.stopPropagation(); var url = numEl.getAttribute('data-url'); if(url) window.open(url,'_blank'); return; }
+      var row = e.target.closest('.jrn-row');
+      if (row) { var id = row.getAttribute('data-id'); if(id) jrn_openModal(id); }
+    });
+  }
+  jrn_renderStatusOptions();
+  await jrn_loadRecords();
+  jrn_render();
+}
+</script>
+</body>
+</html>
+
+<!-- ВКЛАДКА: ЖУРНАЛИ РЕЄСТРАЦІЇ -->
+<div id="tab-journals" class="tab-panel">
+<div style="background:#fff;border-bottom:2px solid #dde1e9;padding:0 24px;display:flex;align-items:stretch;gap:0">
+    <button class="tab-btn" onclick="jrn_setJournal('in',this)" style="color:#1a1d23;font-size:12px;padding:0 16px;border-bottom-color:transparent" id="jrn-btn-in">Вхідна пошта</button>
+    <button class="tab-btn" onclick="jrn_setJournal('out',this)" style="color:#1a1d23;font-size:12px;padding:0 16px;border-bottom-color:transparent" id="jrn-btn-out">Вихідна пошта</button>
+    <button class="tab-btn" onclick="jrn_setJournal('contr',this)" style="color:#1a1d23;font-size:12px;padding:0 16px;border-bottom-color:transparent" id="jrn-btn-contr">Договори</button>
+    <button class="tab-btn" onclick="jrn_setJournal('proto',this)" style="color:#1a1d23;font-size:12px;padding:0 16px;border-bottom-color:transparent" id="jrn-btn-proto">Протоколи</button>
+    <div style="margin-left:auto;display:flex;align-items:center">
+      <span id="jrn-sync" style="font-family:monospace;font-size:11px;color:#8a95a8">завантаження...</span>
+    </div>
+  </div>
+
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-label">Компанії</div>
+    <a class="sidebar-link active" onclick="jrn_filterCo('',this)">Усі компанії</a>
+    <a class="sidebar-link" onclick="jrn_filterCo('АМБЕР ТЕХНОЛОДЖІ',this)">АМБЕР ТЕХНОЛОДЖІ</a>
+    <a class="sidebar-link" onclick="jrn_filterCo('БІЗСЕРВІСНЕО',this)">БІЗСЕРВІСНЕО</a>
+    <a class="sidebar-link" onclick="jrn_filterCo('ДЖАРВИС',this)">ДЖАРВИС</a>
+    <a class="sidebar-link" onclick="jrn_filterCo('ДОБРОБУТ ТА ЗАХИСТ',this)">ДОБРОБУТ ТА ЗАХИСТ</a>
+    <a class="sidebar-link" onclick="jrn_filterCo('ДС7',this)">ДС7</a>
+    <a class="sidebar-link" onclick="jrn_filterCo('М21',this)">М21</a>
+    <a class="sidebar-link" onclick="jrn_filterCo('М41',this)">М41</a>
+    <a class="sidebar-link" onclick="jrn_filterCo('ПРОФПОСЕРЕДНИК',this)">ПРОФПОСЕРЕДНИК</a>
+    <a class="sidebar-link" onclick="jrn_filterCo('СКАЙІНС',this)">СКАЙІНС</a>
+    <a class="sidebar-link" onclick="jrn_filterCo('СмартКонсалт',this)">СмартКонсалт</a>
+    <a class="sidebar-link" onclick="jrn_filterCo('ФІТ',this)">ФІТ</a>
+    <a class="sidebar-link" onclick="jrn_filterCo('ФОКУСІТ',this)">ФОКУСІТ</a>
+    <a class="sidebar-link" onclick="jrn_filterCo('ЦОП',this)">ЦОП</a>
+    <a class="sidebar-link" onclick="jrn_filterCo('ROMASSET HOLDINGS',this)">ROMASSET HOLDINGS</a>
+    <div class="sidebar-sep">
+      <div class="sidebar-label" style="padding:10px 16px 4px">Журнал</div>
+      <a class="sidebar-link" onclick="jrn_setJournal('in',document.getElementById('jrn-btn-in'))">📨 Вхідна пошта</a>
+      <a class="sidebar-link" onclick="jrn_setJournal('out',document.getElementById('jrn-btn-out'))">📤 Вихідна пошта</a>
+      <a class="sidebar-link" onclick="jrn_setJournal('contr',document.getElementById('jrn-btn-contr'))">📄 Договори</a>
+      <a class="sidebar-link" onclick="jrn_setJournal('proto',document.getElementById('jrn-btn-proto'))">📋 Протоколи</a>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="stats-row" id="jrn-stats-row"></div>
+
+    <div class="toolbar">
+      <div style="width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #dde1e9">
+        <span style="font-family:monospace;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#8a95a8;font-weight:700">Пошук та фільтрація</span>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary" onclick="jrn_openModal()">+ Новий запис</button>
+          <button class="btn btn-export" onclick="jrn_exportCSV()">↓ CSV</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;width:100%">
+        <div class="filter-group">
+          <span class="filter-label">Пошук по тексту</span>
+          <input class="filter-input" id="jrn-q-search" type="text" placeholder="Номер, контрагент, опис..." oninput="jrn_applyFilters()" style="width:200px">
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Компанія</span>
+          <select class="filter-select" id="jrn-q-co" onchange="jrn_applyFilters()" style="width:180px">
+            <option value="">Всі компанії</option>
+            <option>АМБЕР ТЕХНОЛОДЖІ</option>
+            <option>БІЗСЕРВІСНЕО</option>
+            <option>ДЖАРВИС</option>
+            <option>ДОБРОБУТ ТА ЗАХИСТ</option>
+            <option>ДС7</option>
+            <option>М21</option>
+            <option>М41</option>
+            <option>ПРОФПОСЕРЕДНИК</option>
+            <option>СКАЙІНС</option>
+            <option>СмартКонсалт</option>
+            <option>ФІТ</option>
+            <option>ФОКУСІТ</option>
+            <option>ЦОП</option>
+            <option>ROMASSET HOLDINGS</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Рік</span>
+          <select class="filter-select" id="jrn-q-year" onchange="jrn_applyFilters()" style="width:100px">
+            <option value="">Усі роки</option>
+            <option value="2026" selected>2026</option>
+            <option value="2025">2025</option>
+            <option value="2024">2024</option>
+          </select>
+        </div>
+        <div class="filter-group" id="jrn-sfg">
+          <span class="filter-label">Статус</span>
+          <select class="filter-select" id="jrn-q-status" onchange="jrn_applyFilters()" style="width:160px">
+            <option value="">Всі статуси</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Дата від</span>
+          <input class="filter-input" id="jrn-q-dfrom" type="date" onchange="jrn_applyFilters()" style="width:140px">
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Дата до</span>
+          <input class="filter-input" id="jrn-q-dto" type="date" onchange="jrn_applyFilters()" style="width:140px">
+        </div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table id="jrn-main-table">
+        <thead id="jrn-thead"></thead>
+        <tbody id="jrn-tbody"></tbody>
+      </table>
+      <div class="empty-state hidden" id="jrn-empty">Записів не знайдено</div>
+      <div class="pagination" id="jrn-pg"></div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay hidden" id="jrn-moverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="jrn-mtitle">Новий запис</span>
+      <button class="modal-close" onclick="jrn_closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid" id="jrn-mform"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-sm" id="jrn-bdel" onclick="jrn_deleteRecord()" style="margin-right:auto;display:none">Видалити</button>
+      <button class="btn btn-export" onclick="jrn_closeModal()">Скасувати</button>
+      <button class="btn btn-success" onclick="jrn_saveRecord()">Зберегти</button>
+    </div>
+  </div>
+</div>
+
+<!-- /tab-journals -->
+
