@@ -1,87 +1,133 @@
-const { getStore } = require("@netlify/blobs");
+exports.handler = async (event) => {
 
-exports.handler = async (event, context) => {
+  const headers = {
 
-      const headers = {
+    "Access-Control-Allow-Origin": "*",
 
-              "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
 
-              "Access-Control-Allow-Headers": "Content-Type",
+    "Content-Type": "application/json"
 
-              "Content-Type": "application/json"
+  };
 
-      };
+  if (event.httpMethod === "OPTIONS") {
 
-      if (event.httpMethod === "OPTIONS") {
+    return { statusCode: 200, headers, body: "" };
 
-        return { statusCode: 200, headers, body: "" };
+  }
+
+  const params = event.queryStringParameters || {};
+
+  const key = params.key;
+
+  if (!key) {
+
+    return { statusCode: 400, headers, body: JSON.stringify({ error: "key required" }) };
+
+  }
+
+  // Log env vars for debugging
+
+  const siteId = process.env.NETLIFY_SITE_ID;
+
+  const token = process.env.NETLIFY_AUTH_TOKEN;
+
+  if (!siteId || !token) {
+
+    return {
+
+      statusCode: 500,
+
+      headers,
+
+      body: JSON.stringify({
+
+        error: "Missing env vars",
+
+        hasSiteId: !!siteId,
+
+        hasToken: !!token
+
+      })
+
+    };
+
+  }
+
+  const storeName = "journals";
+
+  const blobUrl = `https://api.netlify.com/api/v1/blobs/${siteId}/${storeName}/${encodeURIComponent(key)}`;
+
+  try {
+
+    if (event.httpMethod === "GET") {
+
+      const r = await fetch(blobUrl, {
+
+        headers: { Authorization: `Bearer ${token}` }
+
+      });
+
+      if (r.status === 404 || r.status === 204) {
+
+        return { statusCode: 200, headers, body: JSON.stringify({ value: "[]" }) };
+
+      }
+
+      if (!r.ok) {
+
+        const errText = await r.text();
+
+        return { statusCode: 200, headers, body: JSON.stringify({ value: "[]", apiError: errText, apiStatus: r.status }) };
 
       }
 
-      const params = event.queryStringParameters || {};
+      const text = await r.text();
 
-      const key = params.key;
+      return { statusCode: 200, headers, body: JSON.stringify({ value: text || "[]" }) };
 
-      if (!key) {
+    }
 
-        return { statusCode: 400, headers, body: JSON.stringify({ error: "key required" }) };
+    if (event.httpMethod === "POST") {
 
-      }
+      const body = JSON.parse(event.body || "{}");
 
-      try {
+      const value = body.value || "[]";
 
-        const store = getStore("journals");
+      const r = await fetch(blobUrl, {
 
-        if (event.httpMethod === "GET") {
+        method: "PUT",
 
-                let val = null;
+        headers: {
 
-                try { val = await store.get(key); } catch(e) {}
+          Authorization: `Bearer ${token}`,
 
-                return {
+          "Content-Type": "application/octet-stream"
 
-                            statusCode: 200,
+        },
 
-                            headers,
+        body: value
 
-                            body: JSON.stringify({ value: val || "[]" })
+      });
 
-                };
+      if (!r.ok) {
 
-        }
+        const errText = await r.text();
 
-        if (event.httpMethod === "POST") {
-
-                const body = JSON.parse(event.body || "{}");
-
-                await store.set(key, body.value || "[]");
-
-                return {
-
-                            statusCode: 200,
-
-                            headers,
-
-                            body: JSON.stringify({ ok: true })
-
-                };
-
-        }
-
-        return { statusCode: 405, headers, body: JSON.stringify({ error: "method not allowed" }) };
-
-      } catch (err) {
-
-        return {
-
-                  statusCode: 500,
-
-                  headers,
-
-                  body: JSON.stringify({ error: err.message })
-
-        };
+        return { statusCode: 500, headers, body: JSON.stringify({ error: errText, status: r.status }) };
 
       }
+
+      return { statusCode: 200, headers, body: JSON.stringify({ ok: true }) };
+
+    }
+
+    return { statusCode: 405, headers, body: JSON.stringify({ error: "method not allowed" }) };
+
+  } catch (err) {
+
+    return { statusCode: 500, headers, body: JSON.stringify({ error: err.message }) };
+
+  }
 
 };
