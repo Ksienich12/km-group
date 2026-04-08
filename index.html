@@ -297,7 +297,7 @@ body { background: #f0f2f5; color: #1a1d23; font-family: Arial, sans-serif; font
 .num-cell { font-family: monospace; font-weight: 700; font-size: 14px; color: #1e4fa0; white-space: nowrap; }
 .num-link { text-decoration: underline; text-decoration-style: dotted; cursor: pointer; }
 .num-link:hover { text-decoration-style: solid; }
-.date-cell { font-family: monospace; font-size: 13px; color: #4a5568; white-space: nowrap; }
+.date-cell { font-family: monospace; font-size: 15px; color: #4a5568; white-space: nowrap; }
 .co-badge { display: inline-block; background: #e8ebf0; border-radius: 3px; padding: 2px 7px; font-family: monospace; font-size: 12px; color: #1e4fa0; white-space: nowrap; }
 .link-cell a { color: #1e4fa0; text-decoration: none; font-family: monospace; font-size: 11px; }
 .link-cell a:hover { text-decoration: underline; }
@@ -1652,6 +1652,32 @@ var JRN_JOURNALS = {
       {key:"note",   label:"Примітки",           type:"textarea"},
       {key:"link",   label:"Посилання на файл OneDrive", type:"url", placeholder:"https://1drv.ms/..."}
     ]
+  },
+  order: {
+    label: "Накази",
+    storageKey: "jrn_order",
+    statuses: ["Проєкт","Підписано","Діє","Скасовано","Архів"],
+    cols: [
+      {key:"num",    label:"№",          w:"70px"},
+      {key:"date",   label:"Дата",       w:"100px"},
+      {key:"co",     label:"Компанія",   w:"160px"},
+      {key:"otype",  label:"Тип",        w:"160px"},
+      {key:"subj",   label:"Зміст / опис", w:"auto"},
+      {key:"status", label:"Статус",     w:"100px"},
+      {key:"link", label:"", w:"0px", hide:true}
+    ],
+    fields: [
+      {key:"num",    label:"Реєстраційний № *", type:"text",  placeholder:"НК-2026-001", half:true},
+      {key:"date",   label:"Дата наказу *",     type:"date",  half:true},
+      {key:"co",     label:"Компанія",           type:"select-co"},
+      {key:"otype",  label:"Тип наказу",         type:"select", options:["По основній діяльності","По особовому складу","По адміністративно-господарській діяльності","Інше"], half:true},
+      {key:"signer", label:"Підписант",          type:"text",  placeholder:"Прізвище І.О.", half:true},
+      {key:"subj",   label:"Зміст наказу",       type:"textarea"},
+      {key:"status", label:"Статус",             type:"select-status", half:true},
+      {key:"exec",   label:"Відповідальний",     type:"text",  placeholder:"Прізвище І.О.", half:true},
+      {key:"note",   label:"Примітки",           type:"textarea"},
+      {key:"link",   label:"Посилання на файл OneDrive", type:"url", placeholder:"https://1drv.ms/..."}
+    ]
   }
 };
 
@@ -1728,7 +1754,7 @@ async function jrn_setJournal(j, btn) {
   jrn_state.journal = j;
   jrn_state.page = 1;
   jrn_state.status = "";
-  ["in","out","contr","proto"].forEach(function(k){
+  ["in","out","contr","proto","order"].forEach(function(k){
     var el=document.getElementById("jrn-btn-"+k);
     if(el){el.style.color="#1a1d23";el.style.borderBottomColor="transparent";}
   });
@@ -2029,6 +2055,7 @@ async function jrn_initJournals() {
     <button class="tab-btn" onclick="jrn_setJournal('out',this)" style="color:#1a1d23;font-size:12px;padding:0 16px;border-bottom-color:transparent" id="jrn-btn-out">Вихідна пошта</button>
     <button class="tab-btn" onclick="jrn_setJournal('contr',this)" style="color:#1a1d23;font-size:12px;padding:0 16px;border-bottom-color:transparent" id="jrn-btn-contr">Договори</button>
     <button class="tab-btn" onclick="jrn_setJournal('proto',this)" style="color:#1a1d23;font-size:12px;padding:0 16px;border-bottom-color:transparent" id="jrn-btn-proto">Протоколи</button>
+    <button class="tab-btn" onclick="jrn_setJournal('order',this)" style="color:#1a1d23;font-size:12px;padding:0 16px;border-bottom-color:transparent" id="jrn-btn-order">Накази</button>
     <div style="margin-left:auto;display:flex;align-items:center">
       <span id="jrn-sync" style="font-family:monospace;font-size:11px;color:#8a95a8">завантаження...</span>
     </div>
@@ -2058,6 +2085,7 @@ async function jrn_initJournals() {
       <a class="sidebar-link" onclick="jrn_setJournal('out',document.getElementById('jrn-btn-out'))">📤 Вихідна пошта</a>
       <a class="sidebar-link" onclick="jrn_setJournal('contr',document.getElementById('jrn-btn-contr'))">📄 Договори</a>
       <a class="sidebar-link" onclick="jrn_setJournal('proto',document.getElementById('jrn-btn-proto'))">📋 Протоколи</a>
+      <a class="sidebar-link" onclick="jrn_setJournal('order',document.getElementById('jrn-btn-order'))">📜 Накази</a>
     </div>
   </nav>
 
