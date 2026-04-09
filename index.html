@@ -1721,17 +1721,15 @@ async function jrn_netlifyGet(key) {
 async function jrn_netlifySet(key, val) {
   try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {}
   try {
-    var r = await fetch(GAS_URL + '?action=set&key=' + encodeURIComponent(key), {
+    // no-cors: запит доходить до GAS але відповідь не читається через CORS
+    await fetch(GAS_URL + '?action=set&key=' + encodeURIComponent(key), {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      mode: 'no-cors',
+      headers: {'Content-Type': 'text/plain'},
       body: JSON.stringify({value: JSON.stringify(val)})
     });
-    if (r.ok) {
-      var d = await r.json();
-      return d.ok === true;
-    }
-  } catch(e) {}
-  return false;
+    return true;
+  } catch(e) { return false; }
 }
 
 function jrn_getRecords() {
