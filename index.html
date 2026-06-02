@@ -12,16 +12,23 @@
 body { background: #f0f2f5; color: #1a1d23; font-family: Arial, sans-serif; font-size: 15px; line-height: 1.6; }
 
 /* HEADER */
-.header { background: #1a2744; border-bottom: 3px solid #d4a843; padding: 0 24px; display: flex; align-items: stretch; justify-content: space-between; position: sticky; top: 0; z-index: 200; }
-.header-left { display: flex; align-items: center; gap: 20px; }
-.header-title { font-family: monospace; font-size: 15px; font-weight: 700; color: #d4a843; letter-spacing: 0.06em; text-transform: uppercase; padding: 14px 0; }
-.header-meta { font-family: monospace; font-size: 12px; color: #7a8fbe; padding: 14px 0; }
+:root { --header-h: 88px; }
+.header-wrap { position: sticky; top: 0; z-index: 200; border-bottom: 3px solid #d4a843; }
+.header { background: #1a2744; padding: 0 24px; display: flex; align-items: stretch; justify-content: space-between; gap: 24px; }
+.header-brand { display: flex; align-items: center; }
+.header-title { font-family: monospace; font-size: 15px; font-weight: 700; color: #d4a843; letter-spacing: 0.08em; text-transform: uppercase; padding: 15px 0; white-space: nowrap; }
+.header-metabar { background: #14203a; padding: 8px 24px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.meta-pill { font-family: monospace; font-size: 11px; color: #9fb0d4; background: rgba(122,143,190,0.10); border: 1px solid rgba(122,143,190,0.22); border-radius: 4px; padding: 3px 10px; letter-spacing: .02em; }
+.meta-pill b { color: #d4a843; font-weight: 700; }
+.meta-pill.meta-conf { color: #e9c785; background: rgba(212,168,67,0.10); border-color: rgba(212,168,67,0.32); }
 
 /* TABS in header */
 .tab-nav { display: flex; align-items: stretch; gap: 0; }
-.tab-btn { padding: 0 20px; font-family: monospace; font-size: 13px; font-weight: 600; color: #7a8fbe; background: none; border: none; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -3px; transition: color .15s, border-color .15s; letter-spacing: .04em; text-transform: uppercase; }
-.tab-btn:hover { color: #d4a843; }
+.tab-btn { padding: 0 18px; font-family: monospace; font-size: 13px; font-weight: 600; color: #7a8fbe; background: none; border: none; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -3px; transition: color .15s, border-color .15s, background .15s; letter-spacing: .04em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+.tab-btn:hover { color: #d4a843; background: rgba(212,168,67,0.06); }
 .tab-btn.active { color: #d4a843; border-bottom-color: #d4a843; }
+.tab-link { color: #d4a843; }
+.tab-link:hover { background: rgba(212,168,67,0.10); }
 
 /* TAB PANELS */
 .tab-panel { display: none; }
@@ -30,8 +37,8 @@ body { background: #f0f2f5; color: #1a1d23; font-family: Arial, sans-serif; font
 /* ═══════════════════════════════════════
    ДОВІДНИК СТИЛІ
 ═══════════════════════════════════════ */
-.layout { display: flex; min-height: calc(100vh - 56px); }
-.sidebar { width: 240px; flex-shrink: 0; background: #fff; border-right: 1px solid #dde1e9; padding: 12px 0; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; }
+.layout { display: flex; min-height: calc(100vh - var(--header-h)); }
+.sidebar { width: 240px; flex-shrink: 0; background: #fff; border-right: 1px solid #dde1e9; padding: 12px 0; position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h)); overflow-y: auto; }
 .search-box { padding: 8px 14px 10px; border-bottom: 1px solid #dde1e9; }
 .search-input { width: 100%; background: #e8ebf0; border: 1px solid #c4cad6; border-radius: 3px; padding: 8px 10px; font-family: monospace; font-size: 13px; color: #1a1d23; outline: none; }
 .search-result { margin-top: 6px; font-family: monospace; font-size: 11px; color: #8a95a8; display: none; }
@@ -44,7 +51,7 @@ body { background: #f0f2f5; color: #1a1d23; font-family: Arial, sans-serif; font
 .stat-card { background: #fff; border: 1px solid #dde1e9; border-radius: 4px; padding: 14px 16px; }
 .stat-value { font-family: monospace; font-size: 24px; font-weight: 700; color: #1e4fa0; }
 .stat-label { font-size: 12px; color: #8a95a8; margin-top: 3px; }
-.company-card { background: #fff; border: 1px solid #dde1e9; border-radius: 6px; margin-bottom: 14px; overflow: hidden; }
+.company-card { background: #fff; border: 1px solid #dde1e9; border-radius: 6px; margin-bottom: 14px; overflow: hidden; scroll-margin-top: calc(var(--header-h) + 10px); }
 .company-card.hidden { display: none; }
 .company-header { padding: 13px 18px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: #f8f9fb; border-bottom: 1px solid #dde1e9; user-select: none; }
 .company-header:hover { background: #edf0f5; }
@@ -118,7 +125,7 @@ body { background: #f0f2f5; color: #1a1d23; font-family: Arial, sans-serif; font
 ═══════════════════════════════════════ */
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500&display=swap');
 
-#schema-view { font-family: 'IBM Plex Sans', Arial, sans-serif; background: #eef1f6; min-height: calc(100vh - 56px); }
+#schema-view { font-family: 'IBM Plex Sans', Arial, sans-serif; background: #eef1f6; min-height: calc(100vh - var(--header-h)); }
 
 /* legend */
 .sv-leg { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 7px 28px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
@@ -218,17 +225,25 @@ body { background: #f0f2f5; color: #1a1d23; font-family: Arial, sans-serif; font
 <body>
 
 <!-- ═══════════════ HEADER ═══════════════ -->
+<div class="header-wrap">
 <div class="header">
-  <div class="header-left">
+  <div class="header-brand">
     <div class="header-title">Довідник компаній групи</div>
-    <div class="header-meta">Оновлено: 27.05.2026 &nbsp;·&nbsp; ЄДР 01.04.2026 &nbsp;·&nbsp; Реєстр посередників НБУ 27.05.2026 &nbsp;·&nbsp; Конфіденційно</div>
   </div>
   <div class="tab-nav">
     <button class="tab-btn active" onclick="switchTab('directory', this)">📋 Довідник</button>
-    <button class="tab-btn" onclick="switchTab('schema', this)">🗂 Схема власності</button>
+    <button class="tab-btn" onclick="switchTab('schema', this)">🏢 Схема власності</button>
     <button class="tab-btn" onclick="switchTab('docs', this)">📁 Документи</button>
     <button class="tab-btn" onclick="switchTab('staff', this)">👥 Співробітники</button>
+    <a class="tab-btn tab-link" href="https://1drv.ms/x/c/0422097903eac997/IQB9ay2oEON-S5Y4t5hF-cQCAV6F_p1rV9uadf6Sl63KO0M?e=fspMvB" target="_blank" rel="noopener">📒 Журнал реєстрацій ↗</a>
   </div>
+</div>
+<div class="header-metabar">
+  <span class="meta-pill">Оновлено: <b>02.06.2026</b></span>
+  <span class="meta-pill">ЄДР: <b>02.06.2026</b></span>
+  <span class="meta-pill">Реєстр посередників НБУ: <b>27.05.2026</b></span>
+  <span class="meta-pill meta-conf">🔒 Конфіденційно</span>
+</div>
 </div>
 
 <!-- ═══════════════════════════════════════════
@@ -242,7 +257,6 @@ body { background: #f0f2f5; color: #1a1d23; font-family: Arial, sans-serif; font
       <div class="search-result" id="searchResult"></div>
     </div>
     <a class="sidebar-link" id="sl-amber" onclick="goto('amber')">АМБЕР ТЕКНОЛОДЖІ</a>
-    <a class="sidebar-link" id="sl-bsn" onclick="goto('bsn')">БІЗСЕРВІСНЕО</a>
     <a class="sidebar-link" id="sl-jarvis" onclick="goto('jarvis')">ДЖАРВИС</a>
     <a class="sidebar-link" id="sl-dtz" onclick="goto('dtz')">ДОБРОБУТ ТА ЗАХИСТ (ДТЗ)</a>
     <a class="sidebar-link" id="sl-ds7" onclick="goto('ds7')">ДС7</a>
@@ -250,23 +264,24 @@ body { background: #f0f2f5; color: #1a1d23; font-family: Arial, sans-serif; font
     <a class="sidebar-link" id="sl-m41" onclick="goto('m41')">М41</a>
     <a class="sidebar-link" id="sl-profpos" onclick="goto('profpos')">ПРОФПОСЕРЕДНИК</a>
     <a class="sidebar-link" id="sl-skyins" onclick="goto('skyins')">СКАЙІНС</a>
-    <a class="sidebar-link" id="sl-smart" onclick="goto('smart')">СмартКонсалт</a>
+    <a class="sidebar-link" id="sl-smart" onclick="goto('smart')">СМАРТКОНСАЛТ</a>
     <a class="sidebar-link" id="sl-romasset" onclick="goto('romasset')">ROMASSET HOLDINGS 🇷🇴</a>
     <a class="sidebar-link" id="sl-fit" onclick="goto('fit')">ФІТ</a>
     <a class="sidebar-link" id="sl-fokusit" onclick="goto('fokusit')">ФОКУСІТ</a>
     <a class="sidebar-link" id="sl-cop" onclick="goto('cop')">ЦОП</a>
     <div class="sidebar-sep">
       <a class="sidebar-link" onclick="goto('directors')">📊 Матриця директорів →</a>
-      <a class="sidebar-link" onclick="switchTab('schema', document.querySelector('.tab-btn:nth-child(2)'))">🗂 Схема власності →</a>
+      <a class="sidebar-link" onclick="switchTab('schema', document.querySelector('.tab-btn:nth-child(2)'))">🏢 Схема власності →</a>
       <a class="sidebar-link" onclick="switchTab('docs', document.querySelector('.tab-btn:nth-child(3)'))">📁 Документи →</a>
+      <a class="sidebar-link" href="https://1drv.ms/x/c/0422097903eac997/IQB9ay2oEON-S5Y4t5hF-cQCAV6F_p1rV9uadf6Sl63KO0M?e=fspMvB" target="_blank" rel="noopener">📒 Журнал реєстрацій ↗</a>
     </div>
   </nav>
 
   <main class="main">
     <div class="stats-row">
-      <div class="stat-card"><div class="stat-value">14</div><div class="stat-label">компаній в групі (13 UA + 1 RO)</div></div>
-      <div class="stat-card"><div class="stat-value">239 млн</div><div class="stat-label">загальний капітал (грн)</div></div>
-      <div class="stat-card"><div class="stat-value">29</div><div class="stat-label">банківських рахунків (IBAN)</div></div>
+      <div class="stat-card"><div class="stat-value">13</div><div class="stat-label">компаній в групі (12 UA + 1 RO)</div></div>
+      <div class="stat-card"><div class="stat-value">292 млн</div><div class="stat-label">загальний капітал (грн)</div></div>
+      <div class="stat-card"><div class="stat-value">30</div><div class="stat-label">банківських рахунків (IBAN)</div></div>
       <div class="stat-card"><div class="stat-value">100%</div><div class="stat-label">КБВ — Земляна Н.А.</div></div>
     </div>
     <div class="not-found" id="notFound"></div>
@@ -299,7 +314,7 @@ body { background: #f0f2f5; color: #1a1d23; font-family: Arial, sans-serif; font
 </div>
 
 <div style="overflow-x:auto;padding:16px;-webkit-overflow-scrolling:touch">
-<svg id="sv-main" width="1400" height="860" viewBox="0 0 1400 860" style="display:block;min-width:1400px">
+<svg id="sv-main" width="1400" height="730" viewBox="0 0 1400 730" style="display:block;min-width:1400px">
 <defs>
   <marker id="ar"  markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0.5 L0,6.5 L6,3.5 Z" fill="#dc2626"/></marker>
   <marker id="ab"  markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0.5 L0,6.5 L6,3.5 Z" fill="#2563eb"/></marker>
@@ -307,288 +322,166 @@ body { background: #f0f2f5; color: #1a1d23; font-family: Arial, sans-serif; font
   <marker id="ao"  markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0.5 L0,6.5 L6,3.5 Z" fill="#d97706"/></marker>
   <marker id="as2" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0.5 L0,6.5 L6,3.5 Z" fill="#64748b"/></marker>
 </defs>
-
-<!-- ══════════════════════════════════════
-     РЯДОК 0 — ФІЗИЧНІ ОСОБИ (y=28)
-══════════════════════════════════════ -->
-
-<!-- КСЄНІЧ М.А. -->
+<rect x="20" y="45" width="320" height="250" rx="12" fill="#fff8f0" stroke="#c2742a" stroke-width="1.5" stroke-dasharray="2 3"/>
 <g onclick="svp('ksenich_m')" style="cursor:pointer">
-  <rect x="28" y="28" width="155" height="58" rx="7" fill="#7f1d1d" stroke="#991b1b" stroke-width="1.5"/>
-  <text x="105" y="49" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="700" fill="#fecaca">КСЄНІЧ М.А.</text>
-  <text x="105" y="64" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#fca5a5">Батько · нерухомість</text>
-  <text x="105" y="78" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#f87171">вул. Полярна 8-Е</text>
+<rect x="95" y="75" width="170" height="56" rx="7" fill="#7f1d1d" stroke="#991b1b" stroke-width="1.5"/>
+<text x="180" y="91" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="12" font-weight="700" fill="#fecaca">КСЄНІЧ М.А.</text>
+<text x="180" y="106" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="400" fill="#fca5a5">Батько · нерухомість</text>
 </g>
-
-<!-- ЗЕМЛЯНА Н.А. -->
-<g onclick="svp('zemlyana')" style="cursor:pointer">
-  <rect x="510" y="18" width="280" height="68" rx="9" fill="#7f1d1d" stroke="#991b1b" stroke-width="2"/>
-  <text x="650" y="42" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" fill="#fecaca">ЗЕМЛЯНА Н.А.</text>
-  <text x="650" y="58" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#fca5a5">РНОКПП 2042116787 · д.н. 29.11.1955</text>
-  <text x="650" y="72" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#f87171">Єдиний бенефіціар холдингу</text>
-</g>
-
-<!-- КСЄНІЧ К.М. -->
-<g onclick="svp('ksenich_k')" style="cursor:pointer">
-  <rect x="940" y="28" width="165" height="58" rx="7" fill="#7f1d1d" stroke="#991b1b" stroke-width="1.5"/>
-  <text x="1022" y="49" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="700" fill="#fecaca">КСЄНІЧ К.М.</text>
-  <text x="1022" y="64" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#fca5a5">Син · ном. дир. ФОКУСІТ</text>
-  <text x="1022" y="78" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#f87171">Засн. СКАЙІНС · дир. ROMASSET</text>
-</g>
-
-<!-- ЛОЗЕНКО Н.А. -->
-<g onclick="svp('lozenko')" style="cursor:pointer">
-  <rect x="1200" y="28" width="165" height="58" rx="7" fill="#7f1d1d" stroke="#991b1b" stroke-width="1.5"/>
-  <text x="1282" y="49" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="700" fill="#fecaca">ЛОЗЕНКО Н.А.</text>
-  <text x="1282" y="64" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#fca5a5">Ном. директорка М21</text>
-</g>
-
-<!-- ══════════════════════════════════════
-     РЯДОК 1 — ХОЛДИНГИ + ОСОБИСТІ (y=155)
-══════════════════════════════════════ -->
-
-<!-- Ксєніч М → М21 -->
-<line x1="72" y1="86" x2="72" y2="155" stroke="#d97706" stroke-width="1.5" marker-end="url(#ao)"/>
-<text x="78" y="122" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#d97706">100%</text>
-<!-- Ксєніч М → М41 -->
-<line x1="145" y1="86" x2="205" y2="155" stroke="#d97706" stroke-width="1.5" marker-end="url(#ao)"/>
-<text x="168" y="122" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#d97706">100%</text>
-
-<!-- М21 -->
+<line x1="150" y1="131" x2="110" y2="205" stroke="#d97706" stroke-width="1.5" marker-end="url(#ao)"/>
+<text x="118" y="172" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#d97706">100%</text>
+<line x1="210" y1="131" x2="255" y2="205" stroke="#d97706" stroke-width="1.5" marker-end="url(#ao)"/>
+<text x="248" y="172" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#d97706">100%</text>
 <g onclick="svp('m21')" style="cursor:pointer">
-  <rect x="28" y="155" width="130" height="68" rx="7" fill="#78350f" stroke="#92400e" stroke-width="1.5"/>
-  <text x="93" y="176" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="12" font-weight="700" fill="#fed7aa">М21</text>
-  <text x="93" y="191" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fdba74">40991786</text>
-  <text x="93" y="204" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fdba74">1.08 млн · 2016</text>
-  <text x="93" y="216" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#fb923c">Лозенко Р. (ном.)</text>
+<rect x="45" y="205" width="130" height="72" rx="7" fill="#78350f" stroke="#92400e" stroke-width="1.5"/>
+<text x="110" y="220" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="12" font-weight="700" fill="#fed7aa">М21</text>
+<text x="110" y="235" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="400" fill="#fdba74">40991786</text>
+<text x="110" y="246" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="400" fill="#fdba74">1.08 млн · 2016</text>
 </g>
-
-<!-- М41 -->
 <g onclick="svp('m41')" style="cursor:pointer">
-  <rect x="175" y="155" width="130" height="68" rx="7" fill="#78350f" stroke="#92400e" stroke-width="1.5"/>
-  <text x="240" y="176" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="12" font-weight="700" fill="#fed7aa">М41</text>
-  <text x="240" y="191" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fdba74">45702739</text>
-  <text x="240" y="204" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fdba74">6 млн · 2025</text>
-  <text x="240" y="216" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#fb923c">Степанюк Н. (ном.)</text>
+<rect x="195" y="205" width="130" height="72" rx="7" fill="#78350f" stroke="#92400e" stroke-width="1.5"/>
+<text x="260" y="220" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="12" font-weight="700" fill="#fed7aa">М41</text>
+<text x="260" y="235" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="400" fill="#fdba74">45702739</text>
+<text x="260" y="246" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="400" fill="#fdba74">6 млн · 2025</text>
 </g>
-
-<!-- Земляна → ФІТ 100% -->
-<line x1="580" y1="86" x2="500" y2="155" stroke="#dc2626" stroke-width="1.5" marker-end="url(#ar)"/>
-<text x="524" y="122" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#dc2626">100%</text>
-<!-- Земляна → ДС7 100% -->
-<line x1="650" y1="86" x2="650" y2="155" stroke="#dc2626" stroke-width="1.5" marker-end="url(#ar)"/>
-<text x="658" y="122" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#dc2626">100%</text>
-<!-- Земляна → ФОКУСІТ 90% -->
-<line x1="720" y1="86" x2="800" y2="155" stroke="#dc2626" stroke-width="1.5" marker-end="url(#ar)"/>
-<text x="776" y="122" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#dc2626">90%</text>
-
-<!-- ФІТ -->
-<g onclick="svp('fit')" style="cursor:pointer">
-  <rect x="400" y="155" width="185" height="72" rx="7" fill="#1e3a8a" stroke="#1e40af" stroke-width="1.5"/>
-  <text x="492" y="178" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" fill="#bfdbfe">ФІТ</text>
-  <text x="492" y="194" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#93c5fd">44434476</text>
-  <text x="492" y="208" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#93c5fd">72.7 млн грн</text>
-  <text x="492" y="220" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#60a5fa">Пилипак В. (ном.)</text>
+<rect x="360" y="45" width="700" height="580" rx="12" fill="#eff6ff" stroke="#1e6fc0" stroke-width="1.5" stroke-dasharray="2 3"/>
+<g onclick="svp('zemlyana')" style="cursor:pointer">
+<rect x="440" y="78" width="240" height="62" rx="7" fill="#7f1d1d" stroke="#991b1b" stroke-width="1.5"/>
+<text x="560" y="93" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" fill="#fecaca">ЗЕМЛЯНА Н.А.</text>
+<text x="560" y="109" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="400" fill="#fca5a5">РНОКПП 2042116787</text>
+<text x="560" y="121" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="400" fill="#fca5a5">Єдиний бенефіціар</text>
 </g>
-
-<!-- ДС7 -->
-<g onclick="svp('ds7')" style="cursor:pointer">
-  <rect x="600" y="155" width="185" height="72" rx="7" fill="#1e3a8a" stroke="#1e40af" stroke-width="1.5"/>
-  <text x="692" y="178" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" fill="#bfdbfe">ДС7</text>
-  <text x="692" y="194" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#93c5fd">45498127</text>
-  <text x="692" y="208" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#93c5fd">10 тис грн</text>
-  <text x="692" y="220" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#60a5fa">Фрейлік О. (ном.)</text>
-</g>
-
-<!-- ФОКУСІТ -->
-<g onclick="svp('fokusit')" style="cursor:pointer">
-  <rect x="800" y="155" width="185" height="72" rx="7" fill="#1e3a8a" stroke="#1e40af" stroke-width="1.5"/>
-  <text x="892" y="178" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" fill="#bfdbfe">ФОКУСІТ</text>
-  <text x="892" y="194" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#93c5fd">45900452</text>
-  <text x="892" y="208" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#93c5fd">1 млн грн</text>
-  <text x="892" y="220" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#60a5fa">Ксєніч К.М. (ном.)</text>
-</g>
-
-<!-- Ксєніч К → СКАЙІНС -->
-<line x1="1022" y1="86" x2="1022" y2="155" stroke="#d97706" stroke-width="1.5" marker-end="url(#ao)"/>
-<text x="1030" y="122" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#d97706">100%</text>
-
-<!-- СКАЙІНС -->
-<g onclick="svp('skyins')" style="cursor:pointer">
-  <rect x="940" y="155" width="165" height="72" rx="7" fill="#78350f" stroke="#92400e" stroke-width="1.5"/>
-  <text x="1022" y="178" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="12" font-weight="700" fill="#fed7aa">СКАЙІНС</text>
-  <text x="1022" y="194" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#fdba74">46146734</text>
-  <text x="1022" y="208" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#fdba74">100 тис · IT</text>
-  <text x="1022" y="220" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fb923c">Ксєніч К.М.</text>
-</g>
-
-<!-- ROMASSET -->
-<g onclick="svp('romasset')" style="cursor:pointer">
-  <rect x="1120" y="155" width="175" height="72" rx="7" fill="#1e3a8a" stroke="#3b82f6" stroke-width="1.5"/>
-  <text x="1207" y="175" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#bfdbfe">ROMASSET HOLDINGS</text>
-  <text x="1207" y="189" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#93c5fd">CUI 52240197 · Румунія</text>
-  <text x="1207" y="202" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#93c5fd">засн. 29.07.2025</text>
-  <text x="1207" y="215" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#fbbf24">⚠ юр.адреса до 13.07.2026</text>
-  <text x="1207" y="221" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#93c5fd">Засн: Ксєніч В. · дир: Ксєніч К.</text>
-</g>
-
-<!-- Лозенко → ДТЗ -->
-<line x1="1282" y1="86" x2="1282" y2="155" stroke="#d97706" stroke-width="1.5" marker-end="url(#ao)"/>
-<text x="1290" y="122" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#d97706">100%</text>
-
-<!-- ДТЗ -->
-<g onclick="svp('dtz')" style="cursor:pointer">
-  <rect x="1200" y="155" width="175" height="72" rx="7" fill="#78350f" stroke="#92400e" stroke-width="1.5"/>
-  <text x="1287" y="176" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="12" font-weight="700" fill="#fed7aa">ДТЗ</text>
-  <text x="1287" y="191" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fdba74">43713670</text>
-  <text x="1287" y="204" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fdba74">500 тис · Страхування</text>
-  <text x="1287" y="217" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#fb923c">Лозенко Н.А. (вл./дир.)</text>
-  <text x="1287" y="222" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#fb923c">@dtz.in.ua — 6 компаній</text>
-</g>
-
-<!-- ══════════════════════════════════════
-     РЯДОК 2 — ПРОФПОСЕРЕДНИК (y=300)
-══════════════════════════════════════ -->
-
-<!-- ДС7 → ПРОФПОСЕРЕДНИК 50% -->
-<line x1="785" y1="191" x2="860" y2="191" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3"/>
-<line x1="860" y1="191" x2="900" y2="300" stroke="#2563eb" stroke-width="1.5" marker-end="url(#ab)"/>
-<text x="844" y="240" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#2563eb">50%</text>
-
-<!-- ФОКУСІТ → ПРОФПОСЕРЕДНИК 50% -->
-<line x1="892" y1="227" x2="950" y2="300" stroke="#1e40af" stroke-width="1.5" marker-end="url(#ab)"/>
-<text x="934" y="258" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#1e40af">50%</text>
-
-<!-- ПРОФПОСЕРЕДНИК -->
-<g onclick="svp('profpos')" style="cursor:pointer">
-  <rect x="840" y="300" width="210" height="82" rx="7" fill="#1e3a8a" stroke="#1e40af" stroke-width="1.5"/>
-  <text x="945" y="322" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="700" fill="#bfdbfe">ПРОФПОСЕРЕДНИК</text>
-  <text x="945" y="338" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#93c5fd">45722194</text>
-  <text x="945" y="352" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#93c5fd">10 тис грн</text>
-  <text x="945" y="366" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#60a5fa">Процюк І. (ном.)</text>
-</g>
-
-<!-- ══════════════════════════════════════
-     РЯДОК 3 — АМБЕР (y=460)
-══════════════════════════════════════ -->
-
-<!-- ПРОФПОСЕРЕДНИК → АМБЕР 56.10% -->
-<line x1="945" y1="382" x2="945" y2="420" stroke="#16a34a" stroke-width="1.5"/>
-<line x1="945" y1="420" x2="760" y2="420" stroke="#16a34a" stroke-width="1.5"/>
-<line x1="760" y1="420" x2="760" y2="460" stroke="#16a34a" stroke-width="1.5" marker-end="url(#ag)"/>
-<text x="855" y="413" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#16a34a">56.10%</text>
-
-<!-- СмартКонсалт → АМБЕР 43.90% (лінія з лівого блоку схеми) -->
-<line x1="310" y1="738" x2="310" y2="760" stroke="#16a34a" stroke-width="1" stroke-dasharray="4 3"/>
-<line x1="310" y1="760" x2="660" y2="760" stroke="#16a34a" stroke-width="1" stroke-dasharray="4 3"/>
-<line x1="660" y1="760" x2="660" y2="542" stroke="#16a34a" stroke-width="1" stroke-dasharray="4 3"/>
-<line x1="660" y1="542" x2="660" y2="460" stroke="#16a34a" stroke-width="1.5" marker-end="url(#ag)"/>
-<text x="590" y="455" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#16a34a">43.90%</text>
-
-<!-- АМБЕР -->
-<g onclick="svp('amber')" style="cursor:pointer">
-  <rect x="460" y="460" width="500" height="82" rx="9" fill="#14532d" stroke="#16a34a" stroke-width="2"/>
-  <text x="710" y="488" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="15" font-weight="700" fill="#bbf7d0">АМБЕР ТЕХНОЛОДЖІ</text>
-  <text x="710" y="504" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#86efac">45701803 · КБВ: Земляна 78.05% · Степанюк 21.95%</text>
-  <text x="710" y="520" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" fill="#4ade80">210.7 млн грн</text>
-  <text x="710" y="534" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#86efac">Директор: Кривченко В.П.</text>
-</g>
-
-<!-- ══════════════════════════════════════
-     РЯДОК 4 — ОСОБИСТІ (y=580+)
-══════════════════════════════════════ -->
-
-<!-- СТЕПАНЮК Н.О. -->
 <g onclick="svp('stepanyuk')" style="cursor:pointer">
-  <rect x="28" y="400" width="150" height="52" rx="7" fill="#7f1d1d" stroke="#991b1b" stroke-width="1.5"/>
-  <text x="103" y="421" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#fecaca">СТЕПАНЮК Н.О.</text>
-  <text x="103" y="438" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fca5a5">Ном. дир. М41</text>
+<rect x="850" y="78" width="160" height="62" rx="7" fill="#7f1d1d" stroke="#991b1b" stroke-width="1.5"/>
+<text x="930" y="94" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="700" fill="#fecaca">СТЕПАНЮК Н.О.</text>
+<text x="930" y="108" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="400" fill="#fca5a5">КБВ ЦОП · АМБЕР 21.95%</text>
 </g>
-
-<!-- Степанюк → ЦОП -->
-<line x1="103" y1="452" x2="103" y2="490" stroke="#d97706" stroke-width="1.5" marker-end="url(#ao)"/>
-<text x="109" y="473" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#d97706">100%</text>
-
-<!-- ЦОП -->
+<g onclick="svp('fit')" style="cursor:pointer">
+<rect x="380" y="235" width="140" height="64" rx="7" fill="#1e3a8a" stroke="#1e40af" stroke-width="1.5"/>
+<text x="450" y="250" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="12" font-weight="700" fill="#bfdbfe">ФІТ</text>
+<text x="450" y="265" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="400" fill="#93c5fd">44434476</text>
+<text x="450" y="277" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="400" fill="#93c5fd">72.7 млн грн</text>
+</g>
+<g onclick="svp('fokusit')" style="cursor:pointer">
+<rect x="540" y="235" width="140" height="64" rx="7" fill="#1e3a8a" stroke="#1e40af" stroke-width="1.5"/>
+<text x="610" y="250" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="12" font-weight="700" fill="#bfdbfe">ФОКУСІТ</text>
+<text x="610" y="265" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="400" fill="#93c5fd">45900452</text>
+<text x="610" y="277" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="400" fill="#93c5fd">1 млн грн</text>
+</g>
+<g onclick="svp('ds7')" style="cursor:pointer">
+<rect x="700" y="235" width="140" height="64" rx="7" fill="#1e3a8a" stroke="#1e40af" stroke-width="1.5"/>
+<text x="770" y="250" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="12" font-weight="700" fill="#bfdbfe">ДС7</text>
+<text x="770" y="265" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="400" fill="#93c5fd">45498127</text>
+<text x="770" y="277" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="400" fill="#93c5fd">10 тис грн</text>
+</g>
 <g onclick="svp('cop')" style="cursor:pointer">
-  <rect x="28" y="490" width="150" height="68" rx="7" fill="#78350f" stroke="#92400e" stroke-width="1.5"/>
-  <text x="103" y="511" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="12" font-weight="700" fill="#fed7aa">ЦОП</text>
-  <text x="103" y="526" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fdba74">45747009</text>
-  <text x="103" y="539" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fdba74">10 тис · Страхування</text>
-  <text x="103" y="551" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#fb923c">Ісаєв Д. (ном.)</text>
+<rect x="870" y="235" width="140" height="64" rx="7" fill="#78350f" stroke="#92400e" stroke-width="1.5"/>
+<text x="940" y="250" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="12" font-weight="700" fill="#fed7aa">ЦОП</text>
+<text x="940" y="265" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="400" fill="#fdba74">45747009</text>
+<text x="940" y="277" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="400" fill="#fdba74">10 тис грн</text>
 </g>
-
-<!-- ЦОП → ФІНТЕХІНВЕСТ 10% -->
-<line x1="178" y1="524" x2="238" y2="524" stroke="#d97706" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#ao)"/>
-<text x="196" y="517" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="700" fill="#d97706">10%</text>
-
-<!-- ФІНТЕХІНВЕСТ -->
-<g onclick="svp('fintekh')" style="cursor:pointer">
-  <rect x="238" y="500" width="170" height="50" rx="7" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 3"/>
-  <text x="323" y="521" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#334155">ФІНТЕХІНВЕСТ</text>
-  <text x="323" y="535" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#64748b">45557433</text>
-  <text x="323" y="547" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#94a3b8">90% власників не розкрито</text>
+<line x1="510" y1="140" x2="450" y2="235" stroke="#dc2626" stroke-width="1.5" marker-end="url(#ar)"/>
+<text x="462" y="190" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#dc2626">100%</text>
+<line x1="560" y1="140" x2="610" y2="235" stroke="#dc2626" stroke-width="1.5" marker-end="url(#ar)"/>
+<text x="602" y="190" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#dc2626">90%</text>
+<line x1="610" y1="140" x2="770" y2="235" stroke="#dc2626" stroke-width="1.5" marker-end="url(#ar)"/>
+<text x="720" y="188" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#dc2626">100%</text>
+<line x1="930" y1="140" x2="940" y2="235" stroke="#d97706" stroke-width="1.5" marker-end="url(#ao)"/>
+<text x="960" y="190" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#d97706">100%</text>
+<line x1="700" y1="258" x2="682" y2="258" stroke="#2563eb" stroke-width="1.5" marker-end="url(#ab)"/>
+<text x="691" y="250" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#2563eb">10%</text>
+<g onclick="svp('profpos')" style="cursor:pointer">
+<rect x="560" y="400" width="170" height="64" rx="7" fill="#1e3a8a" stroke="#1e40af" stroke-width="1.5"/>
+<text x="645" y="415" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="700" fill="#bfdbfe">ПРОФПОСЕРЕДНИК</text>
+<text x="645" y="429" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="400" fill="#93c5fd">45722194</text>
+<text x="645" y="441" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="400" fill="#93c5fd">10 тис грн</text>
 </g>
-
-<!-- БЛАЖІЄВСЬКИЙ В.М. -->
-<g onclick="svp('blazh')" style="cursor:pointer">
-  <rect x="28" y="590" width="150" height="52" rx="7" fill="#7f1d1d" stroke="#991b1b" stroke-width="1.5"/>
-  <text x="103" y="611" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#fecaca">БЛАЖІЄВСЬКИЙ В.М.</text>
-  <text x="103" y="628" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fca5a5">Боярка · консалтинг</text>
-</g>
-
-<!-- Блажієвський → БІЗСЕРВІСНЕО -->
-<line x1="103" y1="642" x2="103" y2="678" stroke="#d97706" stroke-width="1.5" marker-end="url(#ao)"/>
-<text x="109" y="663" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#d97706">100%</text>
-
-<!-- БІЗСЕРВІСНЕО -->
-<g onclick="svp('bsn')" style="cursor:pointer">
-  <rect x="28" y="678" width="160" height="68" rx="7" fill="#78350f" stroke="#92400e" stroke-width="1.5"/>
-  <text x="108" y="699" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="700" fill="#fed7aa">БІЗСЕРВІСНЕО</text>
-  <text x="108" y="714" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fdba74">46050199</text>
-  <text x="108" y="727" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fdba74">30 тис · Юридичні</text>
-  <text x="108" y="740" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#fb923c">Блажієвський (вл./дир.)</text>
-</g>
-
-<!-- ══════════════════════════════════════
-     СМАРТКОНСАЛТ — під ЦОП, компактно
-══════════════════════════════════════ -->
-
-<!-- ЦОП → СмартКонсалт 50% (горизонталь) -->
-<line x1="103" y1="558" x2="103" y2="580" stroke="#d97706" stroke-width="1.5"/>
-<line x1="103" y1="580" x2="238" y2="580" stroke="#d97706" stroke-width="1.5"/>
-<line x1="238" y1="580" x2="238" y2="660" stroke="#d97706" stroke-width="1.5" marker-end="url(#ao)"/>
-<text x="152" y="575" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="700" fill="#d97706">ЦОП 50%</text>
-
-<!-- ДС7 → СмартКонсалт 50% — коротка лінія зліва від схеми -->
-<line x1="600" y1="191" x2="420" y2="191" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3"/>
-<line x1="420" y1="191" x2="420" y2="640" stroke="#2563eb" stroke-width="1" stroke-dasharray="4 3"/>
-<line x1="420" y1="640" x2="370" y2="660" stroke="#2563eb" stroke-width="1.5" marker-end="url(#ab)"/>
-<text x="390" y="636" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="700" fill="#2563eb">ДС7 50%</text>
-
-<!-- СМАРТКОНСАЛТ -->
 <g onclick="svp('smartkonsalt')" style="cursor:pointer">
-  <rect x="210" y="660" width="200" height="78" rx="7" fill="#78350f" stroke="#92400e" stroke-width="1.5"/>
-  <text x="310" y="681" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="700" fill="#fed7aa">СмартКонсалт</text>
-  <text x="310" y="696" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fdba74">46092134</text>
-  <text x="310" y="709" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fdba74">100 тис · Право, консалт</text>
-  <text x="310" y="722" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#fb923c">Дир: Калініченко · КБВ: Степ.+Зем.</text>
-  <text x="310" y="732" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#fbbf24">Агент АТ СК АРКС · №00025562</text>
+<rect x="790" y="400" width="170" height="64" rx="7" fill="#78350f" stroke="#92400e" stroke-width="1.5"/>
+<text x="875" y="415" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="700" fill="#fed7aa">СМАРТКОНСАЛТ</text>
+<text x="875" y="429" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="400" fill="#fdba74">46092134</text>
+<text x="875" y="441" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="400" fill="#fdba74">100 тис грн</text>
 </g>
-
-<!-- ══════════════════════════════════════
-     SUMMARY BAR (y=800)
-══════════════════════════════════════ -->
-<rect x="0" y="800" width="1400" height="56" rx="0" fill="#1e293b"/>
-<text x="175" y="822" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" fill="#4ade80">210.7 млн грн</text>
-<text x="175" y="840" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#86efac">АМБЕР — найбільший актив</text>
-<text x="525" y="822" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" fill="#93c5fd">14</text>
-<text x="525" y="840" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#bfdbfe">компаній в групі (13 UA + 1 RO)</text>
-<text x="875" y="822" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" fill="#4ade80">✓ Продано</text>
-<text x="875" y="840" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#86efac">АМІДА ФК → Кузуб Т.О. 27.03.2026</text>
-<text x="1225" y="822" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" fill="#fbbf24">239 млн грн</text>
-<text x="1225" y="840" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fde68a">Загальний капітал групи</text>
-
+<line x1="610" y1="299" x2="645" y2="400" stroke="#2563eb" stroke-width="1.5" marker-end="url(#ab)"/>
+<text x="612" y="352" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#2563eb">50%</text>
+<line x1="770" y1="299" x2="665" y2="400" stroke="#2563eb" stroke-width="1.5" marker-end="url(#ab)"/>
+<text x="735" y="352" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#2563eb">50%</text>
+<line x1="770" y1="299" x2="855" y2="400" stroke="#2563eb" stroke-width="1.5" marker-end="url(#ab)"/>
+<text x="840" y="352" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#2563eb">50%</text>
+<line x1="940" y1="299" x2="895" y2="400" stroke="#2563eb" stroke-width="1.5" marker-end="url(#ab)"/>
+<text x="930" y="352" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#2563eb">50%</text>
+<g onclick="svp('fintekh')" style="cursor:pointer">
+<rect x="940" y="318" width="110" height="52" rx="7" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 3"/>
+<text x="995" y="334" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="700" fill="#334155">ФІНТЕХІНВЕСТ</text>
+<text x="995" y="346" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="400" fill="#64748b">45557433</text>
+</g>
+<line x1="990" y1="299" x2="995" y2="318" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#as2)"/>
+<text x="1012" y="312" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#64748b">10%</text>
+<g onclick="svp('amber')" style="cursor:pointer">
+<rect x="520" y="540" width="420" height="72" rx="7" fill="#14532d" stroke="#16a34a" stroke-width="2"/>
+<text x="730" y="555" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="15" font-weight="700" fill="#bbf7d0">АМБЕР ТЕКНОЛОДЖІ</text>
+<text x="730" y="573" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="400" fill="#86efac">45701803 · 210.7 млн грн</text>
+<text x="730" y="586" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" font-weight="400" fill="#86efac">КБВ: Земляна 78.05% · Степанюк 21.95%</text>
+</g>
+<line x1="645" y1="464" x2="710" y2="540" stroke="#16a34a" stroke-width="1.5" marker-end="url(#ag)"/>
+<text x="660" y="508" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#16a34a">56.10%</text>
+<line x1="875" y1="464" x2="800" y2="540" stroke="#16a34a" stroke-width="1.5" marker-end="url(#ag)"/>
+<text x="858" y="508" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#16a34a">43.90%</text>
+<rect x="1080" y="45" width="300" height="375" rx="12" fill="#fff8f0" stroke="#c2742a" stroke-width="1.5" stroke-dasharray="2 3"/>
+<g onclick="svp('ksenich_k')" style="cursor:pointer">
+<rect x="1130" y="72" width="200" height="54" rx="7" fill="#7f1d1d" stroke="#991b1b" stroke-width="1.5"/>
+<text x="1230" y="88" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="700" fill="#fecaca">КСЄНІЧ К.М.</text>
+<text x="1230" y="102" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="400" fill="#fca5a5">Син · ном. дир. ФОКУСІТ</text>
+</g>
+<line x1="1190" y1="126" x2="1157" y2="158" stroke="#d97706" stroke-width="1.5" marker-end="url(#ao)"/>
+<text x="1150" y="148" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#d97706">100%</text>
+<line x1="1270" y1="126" x2="1305" y2="158" stroke="#d97706" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#ao)"/>
+<text x="1320" y="148" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#d97706">адмін</text>
+<g onclick="svp('skyins')" style="cursor:pointer">
+<rect x="1095" y="158" width="125" height="60" rx="7" fill="#78350f" stroke="#92400e" stroke-width="1.5"/>
+<text x="1157.5" y="173" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="700" fill="#fed7aa">СКАЙІНС</text>
+<text x="1157.5" y="187" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="400" fill="#fdba74">46146734</text>
+<text x="1157.5" y="198" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="400" fill="#fdba74">100 тис · IT</text>
+</g>
+<g onclick="svp('romasset')" style="cursor:pointer">
+<rect x="1245" y="158" width="120" height="60" rx="7" fill="#1e3a8a" stroke="#1e40af" stroke-width="1.5"/>
+<text x="1305" y="173" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#bfdbfe">ROMASSET</text>
+<text x="1305" y="186" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="400" fill="#93c5fd">Румунія 🇷🇴</text>
+<text x="1305" y="197" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="400" fill="#93c5fd">засн. Ксєніч В.</text>
+</g>
+<g onclick="svp('kalinichenko')" style="cursor:pointer">
+<rect x="1130" y="250" width="200" height="52" rx="7" fill="#7f1d1d" stroke="#991b1b" stroke-width="1.5"/>
+<text x="1230" y="266" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#fecaca">КАЛІНІЧЕНКО Н.М.</text>
+<text x="1230" y="279" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="400" fill="#fca5a5">Окрема лінія власності</text>
+</g>
+<line x1="1230" y1="302" x2="1230" y2="340" stroke="#d97706" stroke-width="1.5" marker-end="url(#ao)"/>
+<text x="1250" y="326" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#d97706">100%</text>
+<g onclick="svp('jarvis')" style="cursor:pointer">
+<rect x="1165" y="340" width="130" height="58" rx="7" fill="#78350f" stroke="#92400e" stroke-width="1.5"/>
+<text x="1230" y="355" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="700" fill="#fed7aa">ДЖАРВИС</text>
+<text x="1230" y="369" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="400" fill="#fdba74">46370383</text>
+<text x="1230" y="380" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="400" fill="#fdba74">100 тис · бухоблік</text>
+</g>
+<rect x="1080" y="440" width="300" height="185" rx="12" fill="#fff8f0" stroke="#c2742a" stroke-width="1.5" stroke-dasharray="2 3"/>
+<text x="1094" y="460" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" letter-spacing="0.08em" fill="#c2742a">СТРАХОВИЙ БРОКЕР</text>
+<g onclick="svp('lozenko')" style="cursor:pointer">
+<rect x="1130" y="468" width="200" height="52" rx="7" fill="#7f1d1d" stroke="#991b1b" stroke-width="1.5"/>
+<text x="1230" y="484" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="700" fill="#fecaca">ЛОЗЕНКО Н.А.</text>
+<text x="1230" y="498" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="400" fill="#fca5a5">Фін. директор групи</text>
+</g>
+<line x1="1230" y1="520" x2="1230" y2="556" stroke="#d97706" stroke-width="1.5" marker-end="url(#ao)"/>
+<text x="1250" y="544" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#d97706">100%</text>
+<g onclick="svp('dtz')" style="cursor:pointer">
+<rect x="1165" y="556" width="130" height="60" rx="7" fill="#78350f" stroke="#92400e" stroke-width="1.5"/>
+<text x="1230" y="571" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="12" font-weight="700" fill="#fed7aa">ДТЗ</text>
+<text x="1230" y="586" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="400" fill="#fdba74">43713670</text>
+<text x="1230" y="597" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="400" fill="#fdba74">500 тис · @dtz.in.ua</text>
+</g>
+<rect x="0" y="650" width="1400" height="60" rx="0" fill="#1e293b"/>
+<text x="180" y="676" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" fill="#4ade80">210.7 млн грн</text><text x="180" y="695" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#86efac">АМБЕР — найбільший актив</text>
+<text x="525" y="676" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" fill="#93c5fd">13</text><text x="525" y="695" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#bfdbfe">компаній у групі (12 UA + 1 RO)</text>
+<text x="875" y="676" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" fill="#4ade80">✓ Продано</text><text x="875" y="695" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#86efac">АМІДА ФК → Кузуб Т.О. 27.03.2026</text>
+<text x="1225" y="676" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="700" fill="#fbbf24">292 млн грн</text><text x="1225" y="695" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#fde68a">Загальний капітал групи</text>
 </svg>
 </div>
 
@@ -630,6 +523,19 @@ body { background: #f0f2f5; color: #1a1d23; font-family: Arial, sans-serif; font
    СПІВРОБІТНИКИ
 ══════════════════════════════════════ */
 var STAFF_DATA = [
+  { co:"jarvis", coName:"ДЖАРВИС", staff:[
+    {n:"Шелестюк О.Ю.", r:"Бухгалтер-експерт"},
+    {n:"Земляна Н.А.", r:"Економіст з бухгалтерського обліку та аналізу господарської діяльності"},
+    {n:"Ксєніч В.К.", r:"Керівник з реалізації продуктів"}
+  ]},
+  { co:"m21", coName:"М21", staff:[
+    {n:"Лозенко Р.В.", r:"Директор"}
+  ]},
+  { co:"m41", coName:"М41", staff:[
+    {n:"Степанюк Н.О.", r:""},
+    {n:"Лозенко Н.А.", r:""},
+    {n:"Шелестюк О.Ю.", r:""}
+  ]},
   { co:"dtz", coName:"ДОБРОБУТ ТА ЗАХИСТ (ДТЗ)", staff:[
     {n:"Лозенко Н.А.", r:"Директор"},
     {n:"Шелестюк О.Ю.", r:"Економіст з бухгалтерського обліку та аналізу господарської діяльності"}
@@ -651,7 +557,7 @@ var STAFF_DATA = [
     {n:"Ксєніч О.К.", r:""},
     {n:"Шелестюк О.Ю.", r:""}
   ]},
-  { co:"smart", coName:"СмартКонсалт", staff:[
+  { co:"smart", coName:"СМАРТКОНСАЛТ", staff:[
     {n:"Солохін В.Ю.", r:"Юрист"},
     {n:"Заліська О.О.", r:""},
     {n:"Земляна Н.А.", r:""}
@@ -683,25 +589,23 @@ function switchTab(name, btn) {
    ДОВІДНИК ЛОГІКА
 ══════════════════════════════════════ */
 var COMPANIES = [
-  { id:"amber", name:"АМБЕР ТЕКНОЛОДЖІ", full:'ТОВ "АМБЕР ТЕКНОЛОДЖІ"', edrpou:"45701803", ipn:"265725113350", esv:"10000003057311", edr:"1000741020000109957", reg:"23.05.2025", cap:"210,732,393 грн", statute:"Модельний", addr:"01001, м. Київ, вул. Михайлівська, 24/11-13В", phone:"+38(063)-518-81-54", email:"ambertech@amida.in.ua", site:"", dir:"Кривченко Володимир Петрович", dirph:"", owners:[{p:"56.10%",n:"ПРОФПОСЕРЕДНИК",a:"118,219,282 грн"},{p:"43.90%",n:"СмартКонсалт",a:"92,513,111 грн"}], kbv:"Земляна Наталя Анатоліївна — 78.05% · Степанюк Надія Олександрівна — 21.95% (непрямий вирішальний вплив)", controls:[], kveds:[{c:"46.69",d:"оптова торгівля іншими машинами й устаткованням",m:1},{c:"46.90",d:"неспеціалізована оптова торгівля"},{c:"77.39",d:"надання в оренду інших машин, устатковання та товарів, н.в.і.у."}], ibans:[{i:"UA963005280000026001000053553",b:"ОТП БАНК",c:"Наталія",p:"050 724 24 60"},{i:"UA713220010000026005420000981",b:"Універсал Банк",c:"Ігнат Ілля",p:"+38 073 47 11 052"}], notes:[{t:"n",x:"Головна операційна компанія (210.7 млн)"},{t:"n",x:"Засновники змінено: АМІДА ФК вийшла, нові частки — ПРОФПОСЕРЕДНИК 56.10% та СмартКонсалт 43.90% (ЄДР 01.04.2026)"},{t:"w",x:"Директор: Кривченко Володимир Петрович (виписка ЄДР 01.04.2026)"}] },
-  { id:"bsn", name:"БІЗСЕРВІСНЕО", full:'ТОВ "БІЗСЕРВІСНЕО"', edrpou:"46050199", ipn:"265025259604", esv:"10000003173706", edr:"1010741020000108844", reg:"13.10.2025", cap:"30,000 грн", statute:"Модельний", addr:"03038, м. Київ, вул. Амосова Миколи, 12, офіс 12", phone:"+38(093)-168-19-14", email:"bsn@dtz.in.ua", site:"", dir:"Блажієвський Володимир Миколайович", dirph:"+380 50 776 8888 / +380992693875", owners:[{p:"100%",n:"Блажієвський Володимир Миколайович",a:"30,000 грн"}], kbv:"Блажієвський Володимир Миколайович — 100%", controls:[], kveds:[{c:"69.10",d:"діяльність у сфері права",m:1},{c:"66.22",d:"діяльність страхових агентів і брокерів"},{c:"70.22",d:"консультування з питань комерційної діяльності й керування"}], ibans:[], noIban:1, notes:[{t:"w",x:"IBAN відсутній — рахунки ще не відкрито"}] },
-  { id:"jarvis", name:"ДЖАРВИС", full:'ТОВ "ДЖАРВИС"', edrpou:"46370383", ipn:"265726069236", esv:"10000003275761", edr:"1010351020000024195", reg:"27.03.2026", cap:"100,000 грн", statute:"Модельний", addr:"01032, м. Київ, вул. Жилянська, 126/23, офіс 220", phone:"+38(063)-973-94-92", email:"jarvis@dtz.in.ua", site:"", dir:"Солохін Віктор Юрійович", dirph:"+380639739492", owners:[{p:"100%",n:"Калініченко Надія Миколаївна",a:"100,000 грн"}], kbv:"Калініченко Надія Миколаївна — 100% (прямий вирішальний вплив)", controls:[], kveds:[{c:"69.20",d:"діяльність у сфері бухгалтерського обліку й аудиту; консультування з питань оподаткування",m:1},{c:"66.19",d:"інша допоміжна діяльність у сфері фінансових послуг"},{c:"66.21",d:"оцінювання ризиків та завданої шкоди"},{c:"66.22",d:"діяльність страхових агентів і брокерів"},{c:"66.29",d:"інша допоміжна діяльність у сфері страхування та пенсійного забезпечення"},{c:"69.10",d:"діяльність у сфері права"},{c:"70.22",d:"консультування з питань комерційної діяльності й керування"},{c:"82.11",d:"надання комбінованих офісних адміністративних послуг"},{c:"82.20",d:"діяльність телефонних центрів"},{c:"82.99",d:"надання інших допоміжних комерційних послуг, н.в.і.у."}], ibans:[{i:"UA553220010000026003700014826",b:"Універсал Банк",c:"",p:""}], notes:[{t:"n",x:"Зареєстровано 27.03.2026 (ЄДР запис 1010351020000024195)"},{t:"n",x:"Засновниця: Калініченко Надія Миколаївна (РНОКПП 2910802283, д.н. 11.09.1979)"}] },
+  { id:"amber", name:"АМБЕР ТЕКНОЛОДЖІ", full:'ТОВ "АМБЕР ТЕКНОЛОДЖІ"', edrpou:"45701803", ipn:"265725113350", esv:"10000003057311", edr:"1000741020000109957", reg:"23.05.2025", cap:"210,732,393 грн", statute:"Модельний", addr:"01001, м. Київ, вул. Михайлівська, 24/11-13В", phone:"+38(063)-518-81-54", email:"ambertech@amida.in.ua", site:"", dir:"Кривченко Володимир Петрович", dirph:"", owners:[{p:"56.10%",n:"ПРОФПОСЕРЕДНИК",a:"118,219,282 грн"},{p:"43.90%",n:"СМАРТКОНСАЛТ",a:"92,513,111 грн"}], kbv:"Земляна Наталя Анатоліївна — 78.05% · Степанюк Надія Олександрівна — 21.95% (непрямий вирішальний вплив)", controls:[], kveds:[{c:"46.69",d:"оптова торгівля іншими машинами й устаткованням",m:1},{c:"46.90",d:"неспеціалізована оптова торгівля"},{c:"77.39",d:"надання в оренду інших машин, устатковання та товарів, н.в.і.у."}], ibans:[{i:"UA963005280000026001000053553",b:"ОТП БАНК",c:"Наталія",p:"050 724 24 60"},{i:"UA713220010000026005420000981",b:"Універсал Банк",c:"Ігнат Ілля",p:"+38 073 47 11 052"}], notes:[{t:"n",x:"Головна операційна компанія (210.7 млн)"},{t:"n",x:"Засновники змінено: АМІДА ФК вийшла, нові частки — ПРОФПОСЕРЕДНИК 56.10% та СМАРТКОНСАЛТ 43.90% (ЄДР 01.04.2026)"},{t:"w",x:"Директор: Кривченко Володимир Петрович (виписка ЄДР 01.04.2026)"}] },
+  { id:"jarvis", name:"ДЖАРВИС", full:'ТОВ "ДЖАРВИС"', edrpou:"46370383", ipn:"265726069236", esv:"10000003275761", edr:"1010351020000024195", reg:"27.03.2026", cap:"100,000 грн", statute:"Модельний", addr:"01032, м. Київ, вул. Жилянська, 126/23, офіс 220", phone:"+38(063)-973-94-92", email:"jarvis@dtz.in.ua", site:"", dir:"Солохін Віктор Юрійович", dirph:"+380639739492", owners:[{p:"100%",n:"Калініченко Надія Миколаївна",a:"100,000 грн"}], kbv:"Калініченко Надія Миколаївна — 100% (прямий вирішальний вплив)", controls:[], kveds:[{c:"69.20",d:"діяльність у сфері бухгалтерського обліку й аудиту; консультування з питань оподаткування",m:1},{c:"66.19",d:"інша допоміжна діяльність у сфері фінансових послуг"},{c:"66.21",d:"оцінювання ризиків та завданої шкоди"},{c:"66.22",d:"діяльність страхових агентів і брокерів"},{c:"66.29",d:"інша допоміжна діяльність у сфері страхування та пенсійного забезпечення"},{c:"69.10",d:"діяльність у сфері права"},{c:"70.22",d:"консультування з питань комерційної діяльності й керування"},{c:"82.11",d:"надання комбінованих офісних адміністративних послуг"},{c:"82.20",d:"діяльність телефонних центрів"},{c:"82.99",d:"надання інших допоміжних комерційних послуг, н.в.і.у."}], ibans:[{i:"UA553220010000026003700014826",b:"Універсал Банк",c:"",p:""},{i:"UA143510050000026000879284841",b:"УкрСиббанк",c:"",p:""},{i:"UA513005280000026007000057263",b:"ОТП БАНК",c:"",p:""}], notes:[{t:"n",x:"Зареєстровано 27.03.2026 (ЄДР запис 1010351020000024195)"},{t:"n",x:"Засновниця: Калініченко Надія Миколаївна (РНОКПП 2910802283, д.н. 11.09.1979)"}] },
   { id:"dtz", name:"ДОБРОБУТ ТА ЗАХИСТ (ДТЗ)", full:'ТОВ "ДОБРОБУТ ТА ЗАХИСТ"', edrpou:"43713670", ipn:"265520158990", esv:"10000001837401", edr:"10701020000088245", reg:"16.07.2020", cap:"500,000 грн", statute:"Власний", addr:"01014, м. Київ, вул. Катерини Білокур, 10/15, офіс 9", phone:"+38(093)-581-55-81", email:"broker@dtz.in.ua", site:"https://www.dtz.in.ua", dir:"Лозенко Наталя Анатоліївна", dirph:"", owners:[{p:"100%",n:"Лозенко Наталя Анатоліївна",a:"500,000 грн"}], kbv:"Лозенко Наталя Анатоліївна — 100%", controls:[], kveds:[{c:"66.22",d:"діяльність страхових агентів і брокерів",m:1},{c:"66.21",d:"оцінювання ризиків та завданої шкоди"},{c:"66.29",d:"інша допоміжна діяльність у сфері страхування та пенсійного забезпечення"}], ibans:[{i:"UA973003350000000260072203827",b:"Райффайзен Банк",c:"",p:""},{i:"UA953348510000000026007334999",b:"ПУМБ",c:"",p:""},{i:"UA343220010000026002420000876",b:"Універсал Банк",c:"Ігнат Ілля",p:"+38 073 47 11 052"},{i:"UA293806340000026008289024001",b:"КБ АКОРДБАНК",c:"",p:""},{i:"UA033220010000026000420000920",b:"Універсал Банк",c:"спецрахунок",p:""}], notes:[{t:"n",x:"Страховий брокер. Реєстр посередників НБУ: рег.№ 00017329, включено 26.04.2025"},{t:"n",x:"Постачальник IT-інфраструктури для групи (спільний домен @dtz.in.ua)"}] },
-  { id:"ds7", name:"ДС7", full:'ТОВ "ДС7"', edrpou:"45498127", ipn:"265924088582", esv:"10000002777747", edr:"1000741020000106583", reg:"04.04.2024", cap:"10,000 грн", statute:"Модельний", addr:"04050, м. Київ, вул. Білоруська, 30", phone:"+38(093)-119-63-15", email:"ds7@dtz.in.ua", site:"https://ds7.dtz.in.ua/", dir:"Фрейлік Оксана Анатоліївна", dirph:"", owners:[{p:"100%",n:"Земляна Наталя Анатоліївна",a:"10,000 грн"}], kbv:"Земляна Наталя Анатоліївна — 100%", controls:[{n:"ФОКУСІТ",p:"10%"},{n:"ПРОФПОСЕРЕДНИК",p:"50%"},{n:"СмартКонсалт",p:"50%"}], kveds:[{c:"62.01",d:"комп'ютерне програмування",m:1},{c:"66.22",d:"діяльність страхових агентів і брокерів"},{c:"70.22",d:"консультування з питань комерційної діяльності й керування"}], ibans:[{i:"UA153057490000026005000021117",b:"Банк Кредит Дніпро",c:"",p:""},{i:"UA033220010000026003420001012",b:"Універсал Банк",c:"Ігнат Ілля",p:"+38 073 47 11 052"},{i:"UA733005280000026007000053472",b:"ОТП БАНК",c:"Наталія",p:"050 724 24 60"}], notes:[{t:"n",x:"Мінімальний капітал (10 тис), але ключова роль у структурі"},{t:"n",x:"Частка в АМІДА ФК (20.80%) продана Кузуб Т.О. 27.03.2026 за 3,000 грн (договір підписано)"},{t:"n",x:"Реєстр посередників НБУ: страховий агент-мультиагент, рег.№ 00021458, включено 29.08.2025. Страховики: АТ «СК «АРКС» (20474912), ТДВ «СК «АРКС ЛАЙФ» (35692536), ПрАТ «СК «УЛЬТРА АЛЬЯНС» (33152597). Головний страховик — АРКС"}] },
-  { id:"m21", name:"М21", full:'ТОВ "М21"', edrpou:"40991786", ipn:"265916230375", esv:"10000000774016", edr:"10741020000063485", reg:"30.11.2016", cap:"1,080,505 грн", statute:"Власний", addr:"01001, м. Київ, вул. Михайлівська, 24/11В", phone:"+380445815581", email:"m21@dtz.in.ua", site:"", dir:"Лозенко Роман Вікторович", dirph:"", owners:[{p:"100%",n:"Ксєніч Михайло Антонович",a:"1,080,505 грн"}], kbv:"Ксєніч Михайло Антонович — 100%", controls:[], kveds:[{c:"41.10",d:"організація будівництва будівель",m:1},{c:"68.20",d:"надання в оренду й експлуатацію власного чи орендованого нерухомого майна"}], ibans:[{i:"UA493510050000026007637151700",b:"УкрСиббанк",c:"",p:""}], notes:[{t:"n",x:"Нерухомість, будівництво"}] },
-  { id:"m41", name:"М41", full:'ТОВ "М41"', edrpou:"45702739", ipn:"265025023212", esv:"10000002984817", edr:"1000701020000103506", reg:"31.01.2025", cap:"6,000,000 грн", statute:"Модельний", addr:"01104, м. Київ, вул. Катерини Білокур, 10/15, офіс 9", phone:"+38(093)-328-64-58", email:"m41@dtz.in.ua", site:"", dir:"Степанюк Надія Олександрівна", dirph:"+380 67 804 3371", owners:[{p:"100%",n:"Ксєніч Михайло Антонович",a:"6,000,000 грн"}], kbv:"Ксєніч Михайло Антонович — 100%", controls:[], kveds:[{c:"68.20",d:"надання в оренду й експлуатацію власного чи орендованого нерухомого майна",m:1},{c:"41.10",d:"організація будівництва будівель"}], ibans:[{i:"UA813510050000026003879249098",b:"УкрСиббанк",c:"Єгор",p:"+380676154848"}], notes:[{t:"n",x:"Нерухомість, оренда"},{t:"w",x:"Був у Держреєстрі фінустанов — виключено з власної ініціативи 15.01.2025"}] },
-  { id:"profpos", name:"ПРОФПОСЕРЕДНИК", full:'ТОВ "ПРОФПОСЕРЕДНИК"', edrpou:"45722194", ipn:"265025037916", esv:"10000002996214", edr:"1000701020000103677", reg:"19.02.2025", cap:"10,000 грн", statute:"Модельний", addr:"01104, м. Київ, вул. Підвисоцького Професора, 16", phone:"+38(093)-269-16-54", email:"profi@dtz.in.ua", site:"", dir:"Процюк Ігор Миколайович", dirph:"+380 66 373 65 23", owners:[{p:"50%",n:"ДС7",a:"5,000 грн"},{p:"50%",n:"ФОКУСІТ",a:"5,000 грн"}], kbv:"Земляна Наталя Анатоліївна — 100% (непрямий)", controls:[{n:"АМБЕР ТЕКНОЛОДЖІ",p:"56.10%"}], kveds:[{c:"70.22",d:"консультування з питань комерційної діяльності й керування",m:1},{c:"66.22",d:"діяльність страхових агентів і брокерів"}], ibans:[{i:"UA083510050000026009879250014",b:"УкрСиббанк",c:"Олена",p:"093 366 51 78"},{i:"UA503005280000026008000052591",b:"ОТП БАНК",c:"Наталія",p:"050 724 24 60"}], notes:[{t:"n",x:"Посередницька компанія, 56.10% АМБЕР ТЕХНОЛОДЖІ (ЄДР 01.04.2026)"},{t:"n",x:"Договір цесії: АМІДА відступає 2,346,411.53 грн вимог до ФАБРИКА ВВ"},{t:"n",x:"Реєстр посередників НБУ: рег.№ 00023209, включено 20.11.2025. Страховий агент ПрАТ «СК «УЛЬТРА АЛЬЯНС» (33152597); також субагент УЛЬТРА АЛЬЯНС через страхового агента ТОВ «ЕЙДЖІЕФ ГРУП» (44026850). Головний страховик — УЛЬТРА АЛЬЯНС"}] },
-  { id:"skyins", name:"СКАЙІНС", full:'ТОВ "СКАЙІНС"', edrpou:"46146734", ipn:"102925286449", esv:"10000003195136", edr:"1010351020000019952", reg:"08.11.2025", cap:"100,000 грн", statute:"Модельний", addr:"07403, Київська обл., Броварський р-н, м. Бровари, вул. Москаленка С., 19Б, офіс 1", phone:"+38(093)-741-69-88", email:"skyins@dtz.in.ua", site:"", dir:"Ксєніч Костянтин Михайлович", dirph:"", owners:[{p:"100%",n:"Ксєніч Костянтин Михайлович",a:"100,000 грн"}], kbv:"Ксєніч Костянтин Михайлович — 100%", controls:[], kveds:[{c:"62.02",d:"консультування з питань інформатизації",m:1},{c:"62.01",d:"комп'ютерне програмування"}], ibans:[{i:"UA123220010000026004700009067",b:"Універсал Банк",c:"вхід",p:"+380736441212"},{i:"UA723005280000026000000056153",b:"ОТП БАНК",c:"",p:""}], notes:[{t:"n",x:"IT консалтинг. Ксєніч К. також директор ФОКУСІТ"}] },
-  { id:"smart", name:"СмартКонсалт", full:'ТОВ "СМАРТ КОНСАЛТ"', edrpou:"46092134", ipn:"265725285199", esv:"10000003194152", edr:"1010351020000019905", reg:"11.06.2025", cap:"100,000 грн", statute:"Модельний", addr:"03113, м. Київ, пр. Берестейський, буд. 67", phone:"+38(093)-168-19-14", email:"smart@dtz.in.ua", site:"", dir:"Калініченко Надія Миколаївна", dirph:"", owners:[{p:"50%",n:"ЦОП",a:"50,000 грн"},{p:"50%",n:"ДС7",a:"50,000 грн"}], kbv:"Степанюк Надія Олександрівна — 50% (через ЦОП) · Земляна Наталя Анатоліївна — 50% (через ДС7) — непрямий вирішальний вплив", controls:[{n:"АМБЕР ТЕКНОЛОДЖІ",p:"43.90%"}], kveds:[{c:"69.10",d:"діяльність у сфері права",m:1},{c:"66.19",d:"інша допоміжна діяльність у сфері фінансових послуг, крім страхування та пенсійного забезпечення"},{c:"66.21",d:"оцінювання ризиків та завданої шкоди"},{c:"66.22",d:"діяльність страхових агентів і брокерів"},{c:"66.29",d:"інша допоміжна діяльність у сфері страхування та пенсійного забезпечення"},{c:"69.20",d:"діяльність у сфері бухгалтерського обліку й аудиту; консультування з питань оподаткування"},{c:"70.22",d:"консультування з питань комерційної діяльності й керування"},{c:"82.11",d:"надання комбінованих офісних адміністративних послуг"},{c:"82.20",d:"діяльність телефонних центрів"}], ibans:[{i:"UA373220010000026007700009194",b:"Універсал Банк",c:"вхід",p:"+380674459484"},{i:"UA273003460000026004000019666",b:"Сенс Банк",c:"",p:""}], notes:[{t:"n",x:"Де-факто в групі КМ через ДС7 (50%). Email: smart@dtz.in.ua"},{t:"n",x:"НБУ реєстр посередників: рег.№ 00025562, включена 19.03.2026, страховий агент АТ «СК «АРКС» (20474912)"},{t:"n",x:"43.90% АМБЕР ТЕХНОЛОДЖІ (92,513,111 грн) — зафіксовано в ЄДР 01.04.2026"},{t:"n",x:"Дані ЄДР станом на 15.05.2026: КБВ — Степанюк Н.О. 50% + Земляна Н.А. 50% (непрямий через ЦОП/ДС7); Калініченко Н.М. — лише директор"}] },
-  { id:"fit", name:"ФІТ", full:'ТОВ "ФІНАНСОВІ ІНФОРМАЦІЙНІ ТЕХНОЛОГІЇ"', edrpou:"44434476", ipn:"265921331110", esv:"10000002231600", edr:"1000741020000099540", reg:"13.12.2021", cap:"72,660,984 грн", statute:"Власний", addr:"01001, м. Київ, вул. Михайлівська, 24/11В", phone:"+38(063)-280-60-85", email:"admin@oserwin.net", site:"", dir:"Пилипак Василь Васильович", dirph:"+380737000739 / +380 50 604 9657", owners:[{p:"100%",n:"Земляна Наталя Анатоліївна",a:"72,660,984 грн"}], kbv:"Земляна Наталя Анатоліївна — 100%", controls:[], kveds:[{c:"46.69",d:"оптова торгівля іншими машинами й устаткованням",m:1},{c:"66.22",d:"діяльність страхових агентів і брокерів"}], ibans:[{i:"UA093806340000026005288244001",b:"КБ АКОРДБАНК",c:"Олена",p:"+380674590033"},{i:"UA673003350000000260052200057",b:"Райффайзен Банк",c:"",p:""},{i:"UA353005280000026003000054680",b:"ОТП БАНК",c:"",p:""}], notes:[{t:"n",x:"Холдингова компанія Земляної Н.А."},{t:"n",x:"Частка в АМІДА ФК (79.20%) продана 27.03.2026, зміни зареєстровані в ЄДР 01.04.2026"}] },
+  { id:"ds7", name:"ДС7", full:'ТОВ "ДС7"', edrpou:"45498127", ipn:"265924088582", esv:"10000002777747", edr:"1000741020000106583", reg:"04.04.2024", cap:"10,000 грн", statute:"Модельний", addr:"04050, м. Київ, вул. Білоруська, 30", phone:"+38(093)-119-63-15", email:"ds7@dtz.in.ua", site:"https://ds7.dtz.in.ua/", dir:"Фрейлік Оксана Анатоліївна", dirph:"", owners:[{p:"100%",n:"Земляна Наталя Анатоліївна",a:"10,000 грн"}], kbv:"Земляна Наталя Анатоліївна — 100%", controls:[{n:"ФОКУСІТ",p:"10%"},{n:"ПРОФПОСЕРЕДНИК",p:"50%"},{n:"СМАРТКОНСАЛТ",p:"50%"}], kveds:[{c:"62.01",d:"комп'ютерне програмування",m:1},{c:"66.22",d:"діяльність страхових агентів і брокерів"},{c:"70.22",d:"консультування з питань комерційної діяльності й керування"},{c:"62.09",d:"інша діяльність у сфері інформаційних технологій і комп'ютерних систем"},{c:"63.11",d:"оброблення даних, розміщення інформації на веб-вузлах і пов'язана з ними діяльність"},{c:"63.12",d:"веб-портали"},{c:"66.21",d:"оцінювання ризиків та завданої шкоди"},{c:"66.29",d:"інша допоміжна діяльність у сфері страхування та пенсійного забезпечення"},{c:"68.32",d:"управління нерухомим майном за винагороду або на основі контракту"},{c:"73.11",d:"рекламні агентства"},{c:"73.20",d:"дослідження кон'юнктури ринку та виявлення громадської думки"},{c:"81.21",d:"загальне прибирання будинків"},{c:"82.30",d:"організування конгресів і торговельних виставок"}], ibans:[{i:"UA153057490000026005000021117",b:"Банк Кредит Дніпро",c:"",p:""},{i:"UA033220010000026003420001012",b:"Універсал Банк",c:"Ігнат Ілля",p:"+38 073 47 11 052"},{i:"UA733005280000026007000053472",b:"ОТП БАНК",c:"Наталія",p:"050 724 24 60"}], notes:[{t:"n",x:"Мінімальний капітал (10 тис), але ключова роль у структурі"},{t:"n",x:"Частка в АМІДА ФК (20.80%) продана Кузуб Т.О. 27.03.2026 за 3,000 грн (договір підписано)"},{t:"n",x:"Реєстр посередників НБУ: страховий агент-мультиагент, рег.№ 00021458, включено 29.08.2025. Страховики: АТ «СК «АРКС» (20474912), ТДВ «СК «АРКС ЛАЙФ» (35692536), ПрАТ «СК «УЛЬТРА АЛЬЯНС» (33152597). Головний страховик — АРКС"}] },
+  { id:"m21", name:"М21", full:'ТОВ "М21"', edrpou:"40991786", ipn:"265916230375", esv:"10000000774016", edr:"10741020000063485", reg:"30.11.2016", cap:"1,080,505 грн", statute:"Власний", addr:"01001, м. Київ, вул. Михайлівська, 24/11В", phone:"+380445815581", email:"m21@dtz.in.ua", site:"", dir:"Лозенко Роман Вікторович", dirph:"", owners:[{p:"100%",n:"Ксєніч Михайло Антонович",a:"1,080,505 грн"}], kbv:"Ксєніч Михайло Антонович — 100%", controls:[], kveds:[{c:"41.10",d:"організація будівництва будівель",m:1},{c:"68.20",d:"надання в оренду й експлуатацію власного чи орендованого нерухомого майна"},{c:"68.10",d:"купівля та продаж власного нерухомого майна"},{c:"68.31",d:"агентства нерухомості"},{c:"68.32",d:"управління нерухомим майном за винагороду або на основі контракту"},{c:"81.10",d:"комплексне обслуговування об'єктів"}], ibans:[{i:"UA493510050000026007637151700",b:"УкрСиббанк",c:"",p:""}], notes:[{t:"n",x:"Нерухомість, будівництво"}] },
+  { id:"m41", name:"М41", full:'ТОВ "М41"', edrpou:"45702739", ipn:"265025023212", esv:"10000002984817", edr:"1000701020000103506", reg:"31.01.2025", cap:"6,000,000 грн", statute:"Модельний", addr:"01104, м. Київ, вул. Катерини Білокур, 10/15, офіс 9", phone:"+38(093)-328-64-58", email:"m41@dtz.in.ua", site:"", dir:"Степанюк Надія Олександрівна", dirph:"+380 67 804 3371", owners:[{p:"100%",n:"Ксєніч Михайло Антонович",a:"6,000,000 грн"}], kbv:"Ксєніч Михайло Антонович — 100%", controls:[], kveds:[{c:"68.20",d:"надання в оренду й експлуатацію власного чи орендованого нерухомого майна",m:1},{c:"41.20",d:"будівництво житлових і нежитлових будівель"},{c:"43.39",d:"інші роботи із завершення будівництва"},{c:"68.10",d:"купівля та продаж власного нерухомого майна"},{c:"68.31",d:"агентства нерухомості"},{c:"68.32",d:"управління нерухомим майном за винагороду або на основі контракту"},{c:"77.11",d:"надання в оренду автомобілів і легкових автотранспортних засобів"},{c:"77.33",d:"надання в оренду офісних машин і устатковання, у тому числі комп'ютерів"},{c:"77.39",d:"надання в оренду інших машин, устатковання та товарів, н.в.і.у."},{c:"81.10",d:"комплексне обслуговування об'єктів"},{c:"81.21",d:"загальне прибирання будинків"},{c:"81.29",d:"інші види діяльності із прибирання"}], ibans:[{i:"UA813510050000026003879249098",b:"УкрСиббанк",c:"Єгор",p:"+380676154848"}], notes:[{t:"n",x:"Нерухомість, оренда"},{t:"w",x:"Був у Держреєстрі фінустанов — виключено з власної ініціативи 15.01.2025"}] },
+  { id:"profpos", name:"ПРОФПОСЕРЕДНИК", full:'ТОВ "ПРОФПОСЕРЕДНИК"', edrpou:"45722194", ipn:"265025037916", esv:"10000002996214", edr:"1000701020000103677", reg:"19.02.2025", cap:"10,000 грн", statute:"Модельний", addr:"01104, м. Київ, вул. Підвисоцького Професора, 16", phone:"+38(093)-269-16-54", email:"profi@dtz.in.ua", site:"", dir:"Процюк Ігор Миколайович", dirph:"+380 66 373 65 23", owners:[{p:"50%",n:"ДС7",a:"5,000 грн"},{p:"50%",n:"ФОКУСІТ",a:"5,000 грн"}], kbv:"Земляна Наталя Анатоліївна — 100% (непрямий)", controls:[{n:"АМБЕР ТЕКНОЛОДЖІ",p:"56.10%"}], kveds:[{c:"70.22",d:"консультування з питань комерційної діяльності й керування",m:1},{c:"66.22",d:"діяльність страхових агентів і брокерів"},{c:"62.02",d:"консультування з питань інформатизації"},{c:"62.09",d:"інша діяльність у сфері інформаційних технологій і комп'ютерних систем"},{c:"63.11",d:"оброблення даних, розміщення інформації на веб-вузлах і пов'язана з ними діяльність"},{c:"63.12",d:"веб-портали"},{c:"63.99",d:"надання інших інформаційних послуг, н.в.і.у."},{c:"66.21",d:"оцінювання ризиків та завданої шкоди"},{c:"66.29",d:"інша допоміжна діяльність у сфері страхування та пенсійного забезпечення"},{c:"69.10",d:"діяльність у сфері права"},{c:"69.20",d:"діяльність у сфері бухгалтерського обліку й аудиту; консультування з питань оподаткування"},{c:"73.11",d:"рекламні агентства"},{c:"73.12",d:"посередництво в розміщенні реклами в засобах масової інформації"},{c:"74.90",d:"інша професійна, наукова та технічна діяльність, н.в.і.у."},{c:"78.10",d:"діяльність агентств працевлаштування"},{c:"82.11",d:"надання комбінованих офісних адміністративних послуг"},{c:"82.20",d:"діяльність телефонних центрів"},{c:"82.99",d:"надання інших допоміжних комерційних послуг, н.в.і.у."},{c:"85.59",d:"інші види освіти, н.в.і.у."},{c:"85.60",d:"допоміжна діяльність у сфері освіти"}], ibans:[{i:"UA083510050000026009879250014",b:"УкрСиббанк",c:"Олена",p:"093 366 51 78"},{i:"UA503005280000026008000052591",b:"ОТП БАНК",c:"Наталія",p:"050 724 24 60"}], notes:[{t:"n",x:"Посередницька компанія, 56.10% АМБЕР ТЕКНОЛОДЖІ (ЄДР 01.04.2026)"},{t:"n",x:"Договір цесії: АМІДА відступає 2,346,411.53 грн вимог до ФАБРИКА ВВ"},{t:"n",x:"Реєстр посередників НБУ: рег.№ 00023209, включено 20.11.2025. Страховий агент ПрАТ «СК «УЛЬТРА АЛЬЯНС» (33152597); також субагент УЛЬТРА АЛЬЯНС через страхового агента ТОВ «ЕЙДЖІЕФ ГРУП» (44026850). Головний страховик — УЛЬТРА АЛЬЯНС"}] },
+  { id:"skyins", name:"СКАЙІНС", full:'ТОВ "СКАЙІНС"', edrpou:"46146734", ipn:"102925286449", esv:"10000003195136", edr:"1010351020000019952", reg:"08.11.2025", cap:"100,000 грн", statute:"Модельний", addr:"07403, Київська обл., Броварський р-н, м. Бровари, вул. Москаленка С., 19Б, офіс 1", phone:"+38(093)-741-69-88", email:"skyins@dtz.in.ua", site:"", dir:"Ксєніч Костянтин Михайлович", dirph:"", owners:[{p:"100%",n:"Ксєніч Костянтин Михайлович",a:"100,000 грн"}], kbv:"Ксєніч Костянтин Михайлович — 100%", controls:[], kveds:[{c:"62.02",d:"консультування з питань інформатизації",m:1},{c:"62.01",d:"комп'ютерне програмування"},{c:"58.29",d:"видання іншого програмного забезпечення"},{c:"62.03",d:"діяльність із керування комп'ютерним устаткованням"},{c:"62.09",d:"інша діяльність у сфері інформаційних технологій і комп'ютерних систем"},{c:"63.11",d:"оброблення даних, розміщення інформації на веб-вузлах і пов'язана з ними діяльність"},{c:"63.12",d:"веб-портали"},{c:"63.99",d:"надання інших інформаційних послуг, н.в.і.у."},{c:"73.11",d:"рекламні агентства"},{c:"73.12",d:"посередництво в розміщенні реклами в засобах масової інформації"}], ibans:[{i:"UA123220010000026004700009067",b:"Універсал Банк",c:"вхід",p:"+380736441212"},{i:"UA723005280000026000000056153",b:"ОТП БАНК",c:"",p:""}], notes:[{t:"n",x:"IT консалтинг. Ксєніч К. також директор ФОКУСІТ"}] },
+  { id:"smart", name:"СМАРТКОНСАЛТ", full:'ТОВ "СМАРТ КОНСАЛТ"', edrpou:"46092134", ipn:"265725285199", esv:"10000003194152", edr:"1010351020000019905", reg:"06.11.2025", cap:"100,000 грн", statute:"Модельний", addr:"03113, м. Київ, пр. Берестейський, буд. 67", phone:"+38(093)-168-19-14", email:"smart@dtz.in.ua", site:"", dir:"Калініченко Надія Миколаївна", dirph:"", owners:[{p:"50%",n:"ЦОП",a:"50,000 грн"},{p:"50%",n:"ДС7",a:"50,000 грн"}], kbv:"Степанюк Надія Олександрівна — 50% (через ЦОП) · Земляна Наталя Анатоліївна — 50% (через ДС7) — непрямий вирішальний вплив", controls:[{n:"АМБЕР ТЕКНОЛОДЖІ",p:"43.90%"}], kveds:[{c:"69.10",d:"діяльність у сфері права",m:1},{c:"66.19",d:"інша допоміжна діяльність у сфері фінансових послуг, крім страхування та пенсійного забезпечення"},{c:"66.21",d:"оцінювання ризиків та завданої шкоди"},{c:"66.22",d:"діяльність страхових агентів і брокерів"},{c:"66.29",d:"інша допоміжна діяльність у сфері страхування та пенсійного забезпечення"},{c:"69.20",d:"діяльність у сфері бухгалтерського обліку й аудиту; консультування з питань оподаткування"},{c:"70.22",d:"консультування з питань комерційної діяльності й керування"},{c:"82.11",d:"надання комбінованих офісних адміністративних послуг"},{c:"82.20",d:"діяльність телефонних центрів"}], ibans:[{i:"UA373220010000026007700009194",b:"Універсал Банк",c:"вхід",p:"+380674459484"},{i:"UA273003460000026004000019666",b:"Сенс Банк",c:"",p:""},{i:"UA053510050000026007879285638",b:"УкрСиббанк",c:"",p:""}], notes:[{t:"n",x:"Де-факто в групі КМ через ДС7 (50%). Email: smart@dtz.in.ua"},{t:"n",x:"НБУ реєстр посередників: рег.№ 00025562, включена 19.03.2026, страховий агент АТ «СК «АРКС» (20474912)"},{t:"n",x:"43.90% АМБЕР ТЕКНОЛОДЖІ (92,513,111 грн) — зафіксовано в ЄДР 01.04.2026"},{t:"n",x:"Дані ЄДР станом на 15.05.2026: КБВ — Степанюк Н.О. 50% + Земляна Н.А. 50% (непрямий через ЦОП/ДС7); Калініченко Н.М. — лише директор"}] },
+  { id:"fit", name:"ФІТ", full:'ТОВ "ФІНАНСОВІ ІНФОРМАЦІЙНІ ТЕХНОЛОГІЇ"', edrpou:"44434476", ipn:"265921331110", esv:"10000002231600", edr:"1000741020000099540", reg:"13.12.2021", cap:"72,660,984 грн", statute:"Власний", addr:"01001, м. Київ, вул. Михайлівська, 24/11В", phone:"+38(063)-280-60-85", email:"admin@oserwin.net", site:"", dir:"Пилипак Василь Васильович", dirph:"+380737000739 / +380 50 604 9657", owners:[{p:"100%",n:"Земляна Наталя Анатоліївна",a:"72,660,984 грн"}], kbv:"Земляна Наталя Анатоліївна — 100%", controls:[], kveds:[{c:"46.69",d:"оптова торгівля іншими машинами й устаткованням",m:1},{c:"66.22",d:"діяльність страхових агентів і брокерів"},{c:"46.90",d:"неспеціалізована оптова торгівля"},{c:"62.01",d:"комп'ютерне програмування"},{c:"62.09",d:"інша діяльність у сфері інформаційних технологій і комп'ютерних систем"},{c:"63.11",d:"оброблення даних, розміщення інформації на веб-вузлах і пов'язана з ними діяльність"},{c:"63.12",d:"веб-портали"},{c:"66.21",d:"оцінювання ризиків та завданої шкоди"},{c:"66.29",d:"інша допоміжна діяльність у сфері страхування та пенсійного забезпечення"},{c:"77.39",d:"надання в оренду інших машин, устатковання та товарів, н.в.і.у."}], ibans:[{i:"UA093806340000026005288244001",b:"КБ АКОРДБАНК",c:"Олена",p:"+380674590033"},{i:"UA673003350000000260052200057",b:"Райффайзен Банк",c:"",p:""},{i:"UA353005280000026003000054680",b:"ОТП БАНК",c:"",p:""}], notes:[{t:"n",x:"Холдингова компанія Земляної Н.А."},{t:"n",x:"Частка в АМІДА ФК (79.20%) продана 27.03.2026, зміни зареєстровані в ЄДР 01.04.2026"}] },
   { id:"fokusit", name:"ФОКУСІТ", full:'ТОВ "ФОКУСІТ"', edrpou:"45900452", ipn:"265924298918", esv:"10000002948805", edr:"1000741020000108434", reg:"19.11.2024", cap:"1,000,000 грн", statute:"Модельний", addr:"01001, м. Київ, вул. Михайлівська, 24/11В", phone:"+38(093)-950-27-03", email:"admin@oserwin.net", site:"https://focusit.dtz.in.ua/", dir:"Ксєніч Костянтин Михайлович", dirph:"", owners:[{p:"90%",n:"Земляна Наталя Анатоліївна",a:"900,000 грн"},{p:"10%",n:"ДС7",a:"100,000 грн"}], kbv:"Земляна Наталя Анатоліївна — 90%", controls:[{n:"ПРОФПОСЕРЕДНИК",p:"50%"}], kveds:[{c:"62.01",d:"комп'ютерне програмування",m:1},{c:"62.02",d:"консультування з питань інформатизації"},{c:"62.03",d:"діяльність із керування комп'ютерним устаткованням"},{c:"62.09",d:"інша діяльність у сфері інформаційних технологій і комп'ютерних систем"},{c:"63.11",d:"оброблення даних, розміщення інформації на веб-вузлах і пов'язана з ними діяльність"},{c:"63.12",d:"веб-портали"},{c:"63.99",d:"надання інших інформаційних послуг, н.в.і.у."},{c:"66.19",d:"інша допоміжна діяльність у сфері фінансових послуг, крім страхування та пенсійного забезпечення"},{c:"66.21",d:"оцінювання ризиків та завданої шкоди"},{c:"66.22",d:"діяльність страхових агентів і брокерів"},{c:"66.29",d:"інша допоміжна діяльність у сфері страхування та пенсійного забезпечення"},{c:"70.22",d:"консультування з питань комерційної діяльності й керування"},{c:"82.99",d:"надання інших допоміжних комерційних послуг, н.в.і.у."}], ibans:[{i:"UA933510050000026001879242451",b:"УкрСиббанк",c:"Єгор",p:"+380676154848"},{i:"UA063005280000026008000050861",b:"ОТП БАНК",c:"",p:""},{i:"UA433804410000026002001258401",b:"Кредитвест Банк",c:"",p:""}], notes:[{t:"n",x:"Реєстр посередників НБУ: страховий агент-мультиагент, рег.№ 00018366, включено 15.05.2025. Страховики: АТ «СК «АРКС» (20474912), ТДВ «СК «АРКС ЛАЙФ» (35692536), ПрАТ «СК «УЛЬТРА АЛЬЯНС» (33152597). Головний страховик — АРКС"},{t:"n",x:"Повний перелік КВЕД (13 кодів) звірено з ЄДР 27.05.2026"}] },
-  { id:"cop", name:"ЦОП", full:'ТОВ "ЦЕНТР ОБСЛУГОВУВАННЯ ПОСЕРЕДНИКІВ"', edrpou:"45747009", ipn:"265725033901", esv:"10000002993032", edr:"1000741020000109072", reg:"13.02.2025", cap:"10,000 грн", statute:"Модельний", addr:"01001, м. Київ, вул. Михайлівська, 24/11В", phone:"+38(093)-305-33-23", email:"isc@dtz.in.ua", site:"https://cop.dtz.in.ua/", dir:"Ісаєв Денис Ігорович", dirph:"+380 97 325 22 32", owners:[{p:"100%",n:"Степанюк Надія Олександрівна",a:"10,000 грн"}], kbv:"Степанюк Надія Олександрівна — 100%", controls:[], kveds:[{c:"66.22",d:"діяльність страхових агентів і брокерів",m:1},{c:"70.22",d:"консультування з питань комерційної діяльності й керування"}], ibans:[{i:"UA413510050000026005879250041",b:"УкрСиббанк",c:"Єгор",p:"+380676154848"},{i:"UA363805260000026007001970444",b:"КБ Глобус",c:"",p:""}], notes:[{t:"n",x:"Страхове посередництво · 10% ФІНТЕХІНВЕСТ (45557433)"},{t:"n",x:"Реєстр посередників НБУ: страховий агент-мультиагент, рег.№ 00018581, включено 22.05.2025. Страховики: ПрАТ «СК «УЛЬТРА АЛЬЯНС» (33152597), АТ «СК «АРКС» (20474912). Головний страховик — УЛЬТРА АЛЬЯНС. Також субагент УЛЬТРА АЛЬЯНС через страхового агента ТОВ «ЕЙДЖІЕФ ГРУП» (44026850)"}] },
+  { id:"cop", name:"ЦОП", full:'ТОВ "ЦЕНТР ОБСЛУГОВУВАННЯ ПОСЕРЕДНИКІВ"', edrpou:"45747009", ipn:"265725033901", esv:"10000002993032", edr:"1000741020000109072", reg:"13.02.2025", cap:"10,000 грн", statute:"Модельний", addr:"01001, м. Київ, вул. Михайлівська, 24/11В", phone:"+38(093)-305-33-23", email:"isc@dtz.in.ua", site:"https://cop.dtz.in.ua/", dir:"Ісаєв Денис Ігорович", dirph:"+380 97 325 22 32", owners:[{p:"100%",n:"Степанюк Надія Олександрівна",a:"10,000 грн"}], kbv:"Степанюк Надія Олександрівна — 100%", controls:[], kveds:[{c:"66.22",d:"діяльність страхових агентів і брокерів",m:1},{c:"70.22",d:"консультування з питань комерційної діяльності й керування"},{c:"62.01",d:"комп'ютерне програмування"},{c:"62.02",d:"консультування з питань інформатизації"},{c:"62.09",d:"інша діяльність у сфері інформаційних технологій і комп'ютерних систем"},{c:"63.11",d:"оброблення даних, розміщення інформації на веб-вузлах і пов'язана з ними діяльність"},{c:"63.12",d:"веб-портали"},{c:"66.19",d:"інша допоміжна діяльність у сфері фінансових послуг, крім страхування та пенсійного забезпечення"},{c:"69.10",d:"діяльність у сфері права"},{c:"73.11",d:"рекламні агентства"},{c:"73.20",d:"дослідження кон'юнктури ринку та виявлення громадської думки"},{c:"82.99",d:"надання інших допоміжних комерційних послуг, н.в.і.у."}], ibans:[{i:"UA413510050000026005879250041",b:"УкрСиббанк",c:"Єгор",p:"+380676154848"},{i:"UA363805260000026007001970444",b:"КБ Глобус",c:"",p:""}], notes:[{t:"n",x:"Страхове посередництво · 10% ФІНТЕХІНВЕСТ (45557433)"},{t:"n",x:"Реєстр посередників НБУ: страховий агент-мультиагент, рег.№ 00018581, включено 22.05.2025. Страховики: ПрАТ «СК «УЛЬТРА АЛЬЯНС» (33152597), АТ «СК «АРКС» (20474912). Головний страховик — УЛЬТРА АЛЬЯНС. Також субагент УЛЬТРА АЛЬЯНС через страхового агента ТОВ «ЕЙДЖІЕФ ГРУП» (44026850)"}] },
   { id:"romasset", name:"ROMASSET HOLDINGS 🇷🇴", full:"ROMASSET HOLDINGS S.R.L.", edrpou:"CUI 52240197", ipn:"", esv:"", edr:"J2025056615006", reg:"29.07.2025", cap:"200 LEI", statute:"Modell unic", addr:"Municipiul Iași, Str. Podișului, Nr. 14I, Județ Iași", phone:"0745647316", dir:"Xenici Constantin (Ксєніч К.М.)", dirph:"", owners:[{p:"100%",n:"Xenici Vladimir (Ксєніч Володимир) — нар. 15.02.2000",a:"200 LEI"}], kbv:"Ксєніч Костянтин Михайлович (адміністратор, повноваження до 14.07.2045)", controls:[], kveds:[{c:"6421",d:"Activități ale holding-urilor (холдингова діяльність)",m:1},{c:"7020",d:"Consultanță în afaceri și management"}], ibans:[], noIban:1, notes:[{t:"w",x:"⚠ Термін дії юридичної адреси — до 13.07.2026. Необхідно продовжити або змінити адресу"},{t:"n",x:"Румунія (ЄС). Засновник — Ксєніч Володимир (син КМ). EUID: ROONRC.J2025056615006"}] }
 ];
 
 var DIRECTORS = [
   ["АМБЕР ТЕКНОЛОДЖІ","45701803","Земляна Н.А. 78.05% · Степанюк Н.О. 21.95%","Кривченко В.П.","—"],
-  ["БІЗСЕРВІСНЕО","46050199","Блажієвський В.М.","Блажієвський В.М.","+380 50 776 8888"],
   ["ДЖАРВИС","46370383","Калініченко Н.М.","Солохін В.Ю.","+380639739492"],
   ["ДОБРОБУТ ТА ЗАХИСТ","43713670","Лозенко Н.А.","Лозенко Н.А.","—"],
   ["ДС7","45498127","Земляна Н.А. 100%","Фрейлік О.А.","—"],
@@ -709,7 +613,7 @@ var DIRECTORS = [
   ["М41","45702739","Ксєніч М.А.","Степанюк Н.О.","+380 67 804 3371"],
   ["ПРОФПОСЕРЕДНИК","45722194","Земляна Н.А. 100%","Процюк І.М.","+380 66 373 65 23"],
   ["СКАЙІНС","46146734","Ксєніч К.М.","Ксєніч К.М.","—"],
-  ["СмартКонсалт","46092134","Степанюк Н.О. 50% · Земляна Н.А. 50%","Калініченко Н.М.","—"],
+  ["СМАРТКОНСАЛТ","46092134","Степанюк Н.О. 50% · Земляна Н.А. 50%","Калініченко Н.М.","—"],
   ["ROMASSET 🇷🇴","CUI 52240197","Xenici Vladimir 100%","Xenici Constantin (КМ)","0745647316"],
   ["ФІТ","44434476","Земляна Н.А. 100%","Пилипак В.В.","+380737000739"],
   ["ФОКУСІТ","45900452","Земляна Н.А. 90%","Ксєніч К.М.","—"],
@@ -785,7 +689,7 @@ function buildOwnershipChart(compId) {
   function clOf(id) {
     if (!id) return clPers;
     if (id==='amber') return clAmber;
-    if (['fit','ds7','fokusit','profpos','amida','bsn','dtz','m21','m41','skyins','smart','cop','romasset'].indexOf(id)>=0) {
+    if (['fit','ds7','fokusit','profpos','amida','dtz','m21','m41','skyins','smart','cop','romasset'].indexOf(id)>=0) {
       if (['fit','ds7','fokusit','profpos','amida'].indexOf(id)>=0) return clHold;
       return clPers;
     }
@@ -793,7 +697,7 @@ function buildOwnershipChart(compId) {
   }
   function clOfName(n) {
     if (!n) return clHold;
-    if (n.indexOf('Земляна')>=0||n.indexOf('Ксєніч')>=0||n.indexOf('Лозенко')>=0||n.indexOf('Степанюк')>=0||n.indexOf('Блажієвський')>=0||n.indexOf('Калініченко')>=0) return clPhys;
+    if (n.indexOf('Земляна')>=0||n.indexOf('Ксєніч')>=0||n.indexOf('Лозенко')>=0||n.indexOf('Степанюк')>=0||n.indexOf('Калініченко')>=0) return clPhys;
     return clHold;
   }
   function coById(id) { for (var j=0;j<COMPANIES.length;j++) if (COMPANIES[j].id===id) return COMPANIES[j]; return null; }
@@ -973,7 +877,19 @@ function toggle(id) {
 
 function goto(id) {
   var el = document.getElementById("card-"+id)||document.getElementById(id);
-  if (el) el.scrollIntoView({behavior:"smooth",block:"start"});
+  if (!el) return;
+  // Перемикаємось на вкладку Довідник, якщо ми не на ній
+  var dirPanel = document.getElementById('tab-directory');
+  if (dirPanel && !dirPanel.classList.contains('active')) {
+    switchTab('directory', document.querySelector('.tab-btn'));
+  }
+  // Якщо це картка компанії — розгортаємо її
+  var body = document.getElementById("body-"+id), arrow = document.getElementById("arrow-"+id);
+  if (body && !body.classList.contains("open")) {
+    body.classList.add("open");
+    if (arrow) arrow.className = "arrow up";
+  }
+  el.scrollIntoView({behavior:"smooth",block:"start"});
 }
 
 function doSearch() {
@@ -1003,13 +919,13 @@ function doSearch() {
    СХЕМА — SIDE PANEL
 ══════════════════════════════════════ */
 var SV_DATA = {
-  zemlyana:{name:"ЗЕМЛЯНА НАТАЛЯ АНАТОЛІЇВНА",edrpou:"РНОКПП 2042116787 · д.н. 29.11.1955",badges:[{t:"Фізична особа",c:"sv-br"},{t:"Єдиний бенефіціар",c:"sv-br"}],s:[{l:"Адреса",v:"Київ, вул. Гірника Олекси, 4/6"},{l:"Пряма власність",v:"ФІТ 100% · ДС7 100% · ФОКУСІТ 90%"},{l:"Контроль через ланцюг",v:"АМІДА 100% · АМБЕР ≈90.25% · ПРОФПОСЕРЕДНИК 100%"},{l:"Капітал під контролем",v:">320 млн грн"}],info:"Єдиний бенефіціар через: ФІТ + ДС7 + ФОКУСІТ → АМІДА → АМБЕР."},
+  zemlyana:{name:"ЗЕМЛЯНА НАТАЛЯ АНАТОЛІЇВНА",edrpou:"РНОКПП 2042116787 · д.н. 29.11.1955",badges:[{t:"Фізична особа",c:"sv-br"},{t:"Єдиний бенефіціар",c:"sv-br"}],s:[{l:"Адреса",v:"Київ, вул. Гірника Олекси, 4/6"},{l:"Пряма власність",v:"ФІТ 100% · ДС7 100% · ФОКУСІТ 90%"},{l:"Контроль через ланцюг",v:"ПРОФПОСЕРЕДНИК 100% · АМБЕР 78.05% (КБВ)"},{l:"Капітал під контролем",v:">230 млн грн"}],info:"Єдиний бенефіціар через: ФІТ + ДС7 + ФОКУСІТ → ПРОФПОСЕРЕДНИК → АМБЕР (АМІДА ФК вийшла, ЄДР 01.04.2026)."},
   fit:{name:"ФІТ",edrpou:"ЄДРПОУ: 44434476",badges:[{t:"Холдингова",c:"sv-bb"},{t:"Активна",c:"sv-bg"}],s:[{l:"Власниця",v:"Земляна Н.А. 100%"},{l:"Директор",v:"Пилипак Василь (номінальний)"},{l:"Капітал",v:"72,660,984 грн"},{l:"Адреса",v:"Київ, Михайлівська 24/11В"},{l:"Тел.",v:"+38(063)-280-60-85"}],info:"Частка в АМІДА ФК (79.20%) продана 27.03.2026. Зміни зареєстровані ЄДР 01.04.2026."},
-  ds7:{name:"ДС7",edrpou:"ЄДРПОУ: 45498127",badges:[{t:"Холдингова",c:"sv-bb"}],s:[{l:"Власниця",v:"Земляна Н.А. 100%"},{l:"Директорка",v:"Фрейлік О. (номінальна)"},{l:"Капітал",v:"10,000 грн"},{l:"Контролює",v:"10% ФОКУСІТ · 50% ПРОФПОСЕРЕДНИК · 50% СмартКонсалт"},{l:"Реєстр НБУ",v:"Страховий агент-мультиагент №00021458 (29.08.2025) — АРКС, АРКС ЛАЙФ, УЛЬТРА АЛЬЯНС"}],info:"Частка в АМІДА ФК (20.80%) продана Кузуб Т.О. 27.03.2026."},
+  ds7:{name:"ДС7",edrpou:"ЄДРПОУ: 45498127",badges:[{t:"Холдингова",c:"sv-bb"}],s:[{l:"Власниця",v:"Земляна Н.А. 100%"},{l:"Директорка",v:"Фрейлік О. (номінальна)"},{l:"Капітал",v:"10,000 грн"},{l:"Контролює",v:"10% ФОКУСІТ · 50% ПРОФПОСЕРЕДНИК · 50% СМАРТКОНСАЛТ"},{l:"Реєстр НБУ",v:"Страховий агент-мультиагент №00021458 (29.08.2025) — АРКС, АРКС ЛАЙФ, УЛЬТРА АЛЬЯНС"}],info:"Частка в АМІДА ФК (20.80%) продана Кузуб Т.О. 27.03.2026."},
   fokusit:{name:"ФОКУСІТ",edrpou:"ЄДРПОУ: 45900452",badges:[{t:"Холдингова",c:"sv-bb"}],s:[{l:"Власники",v:"Земляна 90% · ДС7 10%"},{l:"Директор",v:"Ксєніч К.М. (номінальний)"},{l:"Капітал",v:"1,000,000 грн"},{l:"IBAN",v:"UA063005280000026008000050861 · ОТП БАНК"},{l:"Контролює",v:"50% ПРОФПОСЕРЕДНИК"},{l:"Реєстр НБУ",v:"Страховий агент-мультиагент №00018366 (15.05.2025) — АРКС, АРКС ЛАЙФ, УЛЬТРА АЛЬЯНС"}]},
   amida:{name:"АМІДА ФК",edrpou:"ЄДРПОУ: 40656531",badges:[{t:"Холдингова",c:"sv-bb"},{t:"⚠ Закриття",c:"sv-br"}],s:[{l:"Власники",v:"ФІТ 79.20% · ДС7 20.80%"},{l:"КБВ",v:"Земляна Н.А. 100%"},{l:"Директорка",v:"Грудковська Аліна (номінальна)"},{l:"Капітал",v:"97,135,000 грн"},{l:"Регулятор",v:"Виключена з Держреєстру 12.03.2026"},{l:"Контролює",v:"АМБЕР 61.68%"}],warn:"Виключена з Держреєстру фінустанов 12.03.2026 (рішення НБУ №21/150-рк). ВЕЛАР ІНВЕСТ вийшов (ЄДР 19.03.2026). Планова перевірка — квітень 2026."},
-  profpos:{name:"ПРОФПОСЕРЕДНИК",edrpou:"ЄДРПОУ: 45722194",badges:[{t:"Холдингова",c:"sv-bb"}],s:[{l:"Власники",v:"ДС7 50% · ФОКУСІТ 50%"},{l:"КБВ",v:"Земляна Н.А. 100%"},{l:"Директор",v:"Процюк Ігор (від 19.01.2026)"},{l:"IBAN",v:"UA503005280000026008000052591 · ОТП БАНК"},{l:"Контролює",v:"56.10% АМБЕР ТЕХНОЛОДЖІ"},{l:"Реєстр НБУ",v:"Агент №00023209 (20.11.2025) — УЛЬТРА АЛЬЯНС; також субагент УЛЬТРА АЛЬЯНС через ЕЙДЖІЕФ ГРУП (44026850)"}],info:"Основний акціонер АМБЕР ТЕХНОЛОДЖІ (56.10%) після виходу АМІДА ФК 01.04.2026."},
-  amber:{name:"АМБЕР ТЕХНОЛОДЖІ",edrpou:"ЄДРПОУ: 45701803",badges:[{t:"Операційна",c:"sv-bg"},{t:"210.7 млн грн",c:"sv-bg"}],s:[{l:"Власники",v:"ПРОФПОСЕРЕДНИК 56.10% · СмартКонсалт 43.90%"},{l:"КБВ",v:"Земляна Н.А. 78.05% · Степанюк Н.О. 21.95%"},{l:"Директор",v:"Кривченко Володимир Петрович"},{l:"Капітал",v:"210,732,393 грн"},{l:"Email",v:"ambertech@amida.in.ua"}],info:"Засновники змінено 01.04.2026: АМІДА ФК вийшла, нові частки — ПРОФПОСЕРЕДНИК 56.10% та СмартКонсалт 43.90%."},
+  profpos:{name:"ПРОФПОСЕРЕДНИК",edrpou:"ЄДРПОУ: 45722194",badges:[{t:"Холдингова",c:"sv-bb"}],s:[{l:"Власники",v:"ДС7 50% · ФОКУСІТ 50%"},{l:"КБВ",v:"Земляна Н.А. 100%"},{l:"Директор",v:"Процюк Ігор (від 19.01.2026)"},{l:"IBAN",v:"UA503005280000026008000052591 · ОТП БАНК"},{l:"Контролює",v:"56.10% АМБЕР ТЕКНОЛОДЖІ"},{l:"Реєстр НБУ",v:"Агент №00023209 (20.11.2025) — УЛЬТРА АЛЬЯНС; також субагент УЛЬТРА АЛЬЯНС через ЕЙДЖІЕФ ГРУП (44026850)"}],info:"Основний акціонер АМБЕР ТЕКНОЛОДЖІ (56.10%) після виходу АМІДА ФК 01.04.2026."},
+  amber:{name:"АМБЕР ТЕКНОЛОДЖІ",edrpou:"ЄДРПОУ: 45701803",badges:[{t:"Операційна",c:"sv-bg"},{t:"210.7 млн грн",c:"sv-bg"}],s:[{l:"Власники",v:"ПРОФПОСЕРЕДНИК 56.10% · СМАРТКОНСАЛТ 43.90%"},{l:"КБВ",v:"Земляна Н.А. 78.05% · Степанюк Н.О. 21.95%"},{l:"Директор",v:"Кривченко Володимир Петрович"},{l:"Капітал",v:"210,732,393 грн"},{l:"Email",v:"ambertech@amida.in.ua"}],info:"Засновники змінено 01.04.2026: АМІДА ФК вийшла, нові частки — ПРОФПОСЕРЕДНИК 56.10% та СМАРТКОНСАЛТ 43.90%."},
   cop:{name:"ЦОП",edrpou:"ЄДРПОУ: 45747009",badges:[{t:"Особиста",c:"sv-ba"}],s:[{l:"Власниця",v:"Степанюк Н.О. 100%"},{l:"Директор",v:"Ісаєв Денис (номінальний)"},{l:"IBAN",v:"UA413510050000026005879250041 · УкрСиббанк"},{l:"Участь",v:"10% ФІНТЕХІНВЕСТ (45557433)"},{l:"Реєстр НБУ",v:"Агент-мультиагент №00018581 (22.05.2025) — УЛЬТРА АЛЬЯНС, АРКС; також субагент УЛЬТРА АЛЬЯНС через ЕЙДЖІЕФ ГРУП (44026850)"}]},
   cop2:{name:"ЦОП",edrpou:"ЄДРПОУ: 45747009",badges:[{t:"Особиста",c:"sv-ba"}],s:[{l:"Власниця",v:"Степанюк Н.О. 100%"},{l:"Директор",v:"Ісаєв Денис (номінальний)"},{l:"IBAN",v:"UA413510050000026005879250041 · УкрСиббанк"}]},
   fintekh:{name:"ФІНТЕХІНВЕСТ",edrpou:"ЄДРПОУ: 45557433",badges:[{t:"Структура уточнюється",c:"sv-ba"}],s:[{l:"Відомі власники",v:"ЦОП — 10%"},{l:"Решта 90%",v:"Не розкрито"}],warn:"Потрібна виписка з ЄДР."},
@@ -1020,13 +936,11 @@ var SV_DATA = {
   ksenich_k:{name:"КСЄНІЧ КОСТЯНТИН МИХАЙЛОВИЧ",edrpou:"Син · КМ",badges:[{t:"Фізична особа",c:"sv-ba"},{t:"Ном. дир. ФОКУСІТ",c:"sv-bb"}],s:[{l:"Адреса",v:"Київ, вул. Полярна, 8-Е, кв. 107"},{l:"Власні компанії",v:"СКАЙІНС (100%)"},{l:"Номінальний директор",v:"ФОКУСІТ (45900452)"},{l:"Адміністратор",v:"ROMASSET HOLDINGS (до 14.07.2045)"}]},
   skyins:{name:"СКАЙІНС",edrpou:"ЄДРПОУ: 46146734",badges:[{t:"Особиста",c:"sv-ba"},{t:"IT",c:"sv-bb"}],s:[{l:"Власник / Директор",v:"Ксєніч К.М. 100%"},{l:"Капітал",v:"100,000 грн"},{l:"Адреса",v:"Бровари, Москаленка 19Б, оф. 1"},{l:"IBAN",v:"UA723005280000026000000056153 · ОТП БАНК"}]},
   lozenko:{name:"ЛОЗЕНКО НАТАЛЯ АНАТОЛІЇВНА",edrpou:"Власниця ДТЗ",badges:[{t:"Фізична особа",c:"sv-ba"}],s:[{l:"Адреса",v:"Київська обл., с. Требухів, вул. Миру, 51"},{l:"Компанії",v:"ДТЗ 100%"},{l:"Роль",v:"Номінальна директорка М21"}]},
-  dtz:{name:"ДОБРОБУТ ТА ЗАХИСТ (ДТЗ)",edrpou:"ЄДРПОУ: 43713670",badges:[{t:"Особиста",c:"sv-ba"},{t:"@dtz.in.ua",c:"sv-bb"}],s:[{l:"Власниця / Директорка",v:"Лозенко Наталя 100%"},{l:"Капітал",v:"500,000 грн"},{l:"Тел.",v:"+38(093)-581-55-81"},{l:"Домен",v:"@dtz.in.ua — ДТЗ · ПРОФПОСЕРЕДНИК · СКАЙІНС · М41 · ЦОП · СмартКонсалт"},{l:"Реєстр НБУ",v:"Страховий брокер №00017329 (26.04.2025)"}],info:"Спільна email-інфраструктура 6 компаній групи."},
+  dtz:{name:"ДОБРОБУТ ТА ЗАХИСТ (ДТЗ)",edrpou:"ЄДРПОУ: 43713670",badges:[{t:"Особиста",c:"sv-ba"},{t:"@dtz.in.ua",c:"sv-bb"}],s:[{l:"Власниця / Директорка",v:"Лозенко Наталя 100%"},{l:"Капітал",v:"500,000 грн"},{l:"Тел.",v:"+38(093)-581-55-81"},{l:"Домен",v:"@dtz.in.ua — ДТЗ · ПРОФПОСЕРЕДНИК · СКАЙІНС · М41 · ЦОП · СМАРТКОНСАЛТ"},{l:"Реєстр НБУ",v:"Страховий брокер №00017329 (26.04.2025)"}],info:"Спільна email-інфраструктура 6 компаній групи."},
   stepanyuk:{name:"СТЕПАНЮК НАДІЯ ОЛЕКСАНДРІВНА",edrpou:"Власниця ЦОП",badges:[{t:"Фізична особа",c:"sv-ba"}],s:[{l:"Адреса",v:"Київ, вул. Миколайчука, 17/1, кв. 71"},{l:"Компанії",v:"ЦОП 100%"},{l:"Роль",v:"Номінальна директорка М41"}]},
   jarvis:{name:"ДЖАРВИС",edrpou:"ЄДРПОУ: 46370383",badges:[{t:"Особиста",c:"sv-ba"},{t:"Нова",c:"sv-bg"}],s:[{l:"Засновниця / КБВ",v:"Калініченко Н.М. 100%"},{l:"Директор",v:"Солохін Віктор Юрійович"},{l:"Капітал",v:"100,000 грн"},{l:"Адреса",v:"Київ, вул. Жилянська, 126/23, оф. 220"},{l:"IBAN",v:"UA553220010000026003700014826 · Універсал Банк"},{l:"Email",v:"jarvis@dtz.in.ua"},{l:"Тел.",v:"+380639739492"}]},
-  kalinichenko:{name:"КАЛІНІЧЕНКО НАДІЯ МИКОЛАЇВНА",edrpou:"Директорка СмартКонсалт · засновниця/КБВ ДЖАРВИС",badges:[{t:"Фізична особа",c:"sv-ba"},{t:"Директорка",c:"sv-bb"}],s:[{l:"Адреса",v:"Київ, вул. Ростиславська, 5-Б, кв. 298"},{l:"Тел.",v:"+38(067)-445-94-84"},{l:"Email",v:"nadya_kn@ukr.net / n.kalinichenko@dtz.in.ua"},{l:"СмартКонсалт",v:"Директорка (НЕ КБВ — ЄДР 15.05.2026)"},{l:"ДЖАРВИС",v:"Засновниця 100% · КБВ"}]},
-  smartkonsalt:{name:"СмартКонсалт",edrpou:"ЄДРПОУ: 46092134",badges:[{t:"Холдингова",c:"sv-bb"},{t:"Активна",c:"sv-bg"},{t:"НБУ агент",c:"sv-bb"}],s:[{l:"Засновники",v:"ЦОП 50% · ДС7 50%"},{l:"КБВ (через ЦОП)",v:"Степанюк Н.О. 50%"},{l:"КБВ (через ДС7)",v:"Земляна Н.А. 50%"},{l:"Директорка",v:"Калініченко Н.М."},{l:"Капітал",v:"100,000 грн"},{l:"Адреса",v:"Київ, пр. Берестейський, буд. 67"},{l:"Email",v:"smart@dtz.in.ua"},{l:"НБУ реєстр",v:"рег.№ 00025562 · включена 19.03.2026"},{l:"Контролює",v:"43.90% АМБЕР ТЕХНОЛОДЖІ (92,513,111 грн)"}],info:"КБВ — Степанюк Н.О. 50% та Земляна Н.А. 50% (непрямий вирішальний вплив через ЦОП і ДС7). Калініченко Н.М. — лише директор. Дані ЄДР 15.05.2026. Зареєстрована в реєстрі страхових посередників НБУ як страховий агент АТ «СК «АРКС»."},
-  blazh:{name:"БЛАЖІЄВСЬКИЙ ВОЛОДИМИР МИКОЛАЙОВИЧ",edrpou:"Власник БІЗСЕРВІСНЕО",badges:[{t:"Фізична особа",c:"sv-ba"}],s:[{l:"Адреса",v:"Київська обл., Боярка, вул. Кібенка, 144"},{l:"Тел.",v:"+380 50 776 8888"},{l:"Компанії",v:"БІЗСЕРВІСНЕО 100%"}]},
-  bsn:{name:"БІЗСЕРВІСНЕО",edrpou:"ЄДРПОУ: 46050199",badges:[{t:"Особиста",c:"sv-ba"},{t:"Юридичні",c:"sv-ba"}],s:[{l:"Власник / Директор",v:"Блажієвський В.М. 100%"},{l:"Капітал",v:"30,000 грн"},{l:"Адреса",v:"Київ, вул. Амосова, 12, оф. 12"},{l:"Тел.",v:"+380 50 776 8888"}],warn:"IBAN відсутній — рахунки не відкрито."}
+  kalinichenko:{name:"КАЛІНІЧЕНКО НАДІЯ МИКОЛАЇВНА",edrpou:"Директорка СМАРТКОНСАЛТ · засновниця/КБВ ДЖАРВИС",badges:[{t:"Фізична особа",c:"sv-ba"},{t:"Директорка",c:"sv-bb"}],s:[{l:"Адреса",v:"Київ, вул. Ростиславська, 5-Б, кв. 298"},{l:"Тел.",v:"+38(067)-445-94-84"},{l:"Email",v:"nadya_kn@ukr.net / n.kalinichenko@dtz.in.ua"},{l:"СМАРТКОНСАЛТ",v:"Директорка (НЕ КБВ — ЄДР 15.05.2026)"},{l:"ДЖАРВИС",v:"Засновниця 100% · КБВ"}]},
+  smartkonsalt:{name:"СМАРТКОНСАЛТ",edrpou:"ЄДРПОУ: 46092134",badges:[{t:"Холдингова",c:"sv-bb"},{t:"Активна",c:"sv-bg"},{t:"НБУ агент",c:"sv-bb"}],s:[{l:"Засновники",v:"ЦОП 50% · ДС7 50%"},{l:"КБВ (через ЦОП)",v:"Степанюк Н.О. 50%"},{l:"КБВ (через ДС7)",v:"Земляна Н.А. 50%"},{l:"Директорка",v:"Калініченко Н.М."},{l:"Капітал",v:"100,000 грн"},{l:"Адреса",v:"Київ, пр. Берестейський, буд. 67"},{l:"Email",v:"smart@dtz.in.ua"},{l:"НБУ реєстр",v:"рег.№ 00025562 · включена 19.03.2026"},{l:"Контролює",v:"43.90% АМБЕР ТЕКНОЛОДЖІ (92,513,111 грн)"}],info:"КБВ — Степанюк Н.О. 50% та Земляна Н.А. 50% (непрямий вирішальний вплив через ЦОП і ДС7). Калініченко Н.М. — лише директор. Дані ЄДР 15.05.2026. Зареєстрована в реєстрі страхових посередників НБУ як страховий агент АТ «СК «АРКС»."},
 };
 
 function svp(id) {
@@ -1141,7 +1055,7 @@ window.onload = function() {
    БІБЛІОТЕКА ДОКУМЕНТІВ
 ══════════════════════════════════════ */
 var LIB_DATA = [
-  { name: "АМБЕР ТЕХНОЛОДЖІ", edr: "45701803", color: "#1D9E75",
+  { name: "АМБЕР ТЕКНОЛОДЖІ", edr: "45701803", color: "#1D9E75",
     folders: [
       { name: "Договори АМБЕР", url: "https://1drv.ms/f/c/0422097903eac997/IgD7URiVuft8Q5KGeDPRwa6AAXjymxsdDHYUw9RCOtYFAlQ?e=LFr5SM" },
       { name: "Листування АМБЕР", url: "https://1drv.ms/f/c/0422097903eac997/IgCE9bmb5G-TT5tcDBGfRif3AecAwUmbeXnauw8olC93nfo?e=meUinS" },
@@ -1227,7 +1141,7 @@ var LIB_DATA = [
       { name: "Юридичні документи СКАЙІНС", url: "https://1drv.ms/f/c/0422097903eac997/IgAmXkKSFyiJR7ku7HYbMjIUATvy4cE5Z1-TJUoTyx0R18Q?e=Wpduty" }
     ]
   },
-  { name: "СмартКонсалт", edr: "46092134", color: "#D4537E",
+  { name: "СМАРТКОНСАЛТ", edr: "46092134", color: "#D4537E",
     folders: [
       { name: "Договори СМАРТКОНСАЛТ", url: "https://1drv.ms/f/c/0422097903eac997/IgAFqgbdpQGLRqlB7lfAhVLCAXapTut0Wo0buswaWaGl6CI?e=w46kB7" },
       { name: "Листування СМАРТКОНСАЛТ", url: "https://1drv.ms/f/c/0422097903eac997/IgDk-wXw-1BbSosotHB-CwqVAR7SyuCVP3-XU3HEffFHQvU?e=ooJHSO" },
